@@ -3,6 +3,7 @@ RansomGuard - Event Schema Module (monitoring/event_schema.py)
 
 Defines the structured, normalized event representation for filesystem actions.
 Converts raw Watchdog event objects into standardized Python dictionary / dataclass instances.
+Includes optional persisted entropy fields to ensure offline replay parity.
 """
 
 import os
@@ -17,14 +18,16 @@ class StructuredEvent:
     """
     Standardized event record representing a filesystem change inside sandbox/demo_folder.
     """
-    event_time: float             # Epoch timestamp when event occurred
-    arrival_time: float           # Epoch timestamp when event was received by watcher
-    event_type: str               # 'created', 'modified', 'moved', 'deleted'
-    src_path: str                 # Relative path from sandbox/demo_folder
-    dest_path: Optional[str]      # Relative destination path (for move events)
-    extension: str                # Source file extension (e.g. '.txt' or '')
-    dest_extension: Optional[str] # Destination file extension (for move events)
-    file_size: int                # File size in bytes (0 if unavailable or deleted)
+    event_time: float                     # Epoch timestamp when event occurred
+    arrival_time: float                   # Epoch timestamp when event was received by watcher
+    event_type: str                       # 'created', 'modified', 'moved', 'deleted'
+    src_path: str                         # Relative path from sandbox/demo_folder
+    dest_path: Optional[str]              # Relative destination path (for move events)
+    extension: str                        # Source file extension (e.g. '.txt' or '')
+    dest_extension: Optional[str]         # Destination file extension (for move events)
+    file_size: int                        # File size in bytes (0 if unavailable or deleted)
+    entropy: Optional[float] = None       # Persisted Shannon entropy reading (if calculated)
+    entropy_delta: Optional[float] = None # Persisted entropy delta reading (if calculated)
 
     def to_dict(self) -> Dict[str, Any]:
         """Converts structured event instance into a standard dictionary."""
@@ -45,6 +48,8 @@ def create_structured_event(
     dest_rel_path: Optional[str] = None,
     abs_file_path: Optional[Path] = None,
     event_time: Optional[float] = None,
+    entropy: Optional[float] = None,
+    entropy_delta: Optional[float] = None,
 ) -> StructuredEvent:
     """
     Factory function to construct a StructuredEvent from raw watcher parameters.
@@ -71,4 +76,6 @@ def create_structured_event(
         extension=src_ext,
         dest_extension=dest_ext,
         file_size=file_size,
+        entropy=entropy,
+        entropy_delta=entropy_delta,
     )

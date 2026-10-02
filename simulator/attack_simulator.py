@@ -16,6 +16,7 @@ import argparse
 import random
 import time
 from pathlib import Path
+from typing import Optional, Callable, Dict, Any, List
 from utils.sandbox_manager import get_demo_dir
 from simulator.simulator_utils import (
     list_demo_files,
@@ -32,15 +33,28 @@ SPEED_DELAYS = {
 }
 
 
-def run_attack_simulation(speed: str = "medium", max_files: int = 20, seed: int = None) -> None:
+def run_attack_simulation(
+    speed: str = "medium",
+    max_files: int = 20,
+    seed: Optional[int] = None,
+    run_id: Optional[str] = None,
+    op_callback: Optional[Callable[[Dict[str, Any]], None]] = None,
+) -> Dict[str, Any]:
     """
     Runs a safe ransomware-like burst simulation on files inside sandbox/demo_folder.
+    Records ground-truth operation timestamps for Stage 3 dataset labeling.
+
+    Returns:
+        Dict[str, Any]: {
+            'attack_start_time': Optional[float],
+            'ground_truth_ops': List[Dict[str, Any]]
+        }
     """
     demo_dir = get_demo_dir()
 
     if not demo_dir.exists():
         print(f"[ATTACK-LIKE ERROR] Demo folder '{demo_dir}' does not exist! Please run reset first.")
-        return
+        return {"attack_start_time": None, "ground_truth_ops": []}
 
     delay = SPEED_DELAYS.get(speed.lower(), 0.1)
     rng = random.Random(seed) if seed is not None else random
@@ -60,17 +74,35 @@ def run_attack_simulation(speed: str = "medium", max_files: int = 20, seed: int 
 
     if not files:
         print("[ATTACK-LIKE] No unencrypted files found. Run reset to restore original files.")
-        return
+        return {"attack_start_time": None, "ground_truth_ops": []}
 
     # Shuffle or limit target count
     rng.shuffle(files)
     target_files = files[:max_files]
+
+    ground_truth_ops: List[Dict[str, Any]] = []
+    attack_start_time: Optional[float] = None
+
+    # Record attack start time immediately prior to first operation
+    attack_start_time = time.time()
 
     for file_path in target_files:
         if not file_path.exists():
             continue
 
         rel_path = file_path.relative_to(demo_dir)
+
+        # Record Ground-Truth Operation 1: RANDOM-WRITE
+        op1_time = time.time()
+        op1_rec = {
+            "run_id": run_id or "local_attack_run",
+            "operation_time": op1_time,
+            "operation_type": "RANDOM_WRITE",
+            "relative_path": str(rel_path),
+        }
+        ground_truth_ops.append(op1_rec)
+        if op_callback:
+            op_callback(op1_rec)
 
         # Action 1: Modify file with random bytes (simulating high entropy)
         print(f"[ATTACK-LIKE] RANDOM-WRITE {rel_path}")
@@ -80,15 +112,32 @@ def run_attack_simulation(speed: str = "medium", max_files: int = 20, seed: int 
 
         time.sleep(delay / 2)
 
-        # Action 2: Change extension to .locked
+        # Record Ground-Truth Operation 2: EXTENSION-CHANGE
         locked_name = file_path.name + ".locked"
         locked_rel_path = (file_path.parent / locked_name).relative_to(demo_dir)
+
+        op2_time = time.time()
+        op2_rec = {
+            "run_id": run_id or "local_attack_run",
+            "operation_time": op2_time,
+            "operation_type": "EXTENSION_CHANGE",
+            "relative_path": str(locked_rel_path),
+        }
+        ground_truth_ops.append(op2_rec)
+        if op_callback:
+            op_callback(op2_rec)
+
+        # Action 2: Change extension to .locked
         print(f"[ATTACK-LIKE] EXTENSION-CHANGE {rel_path} -> {locked_rel_path}")
         safe_rename(file_path, locked_name)
 
         time.sleep(delay / 2)
 
     print("\n[ATTACK-LIKE] Simulation complete")
+    return {
+        "attack_start_time": attack_start_time,
+        "ground_truth_ops": ground_truth_ops,
+    }
 
 
 def main():

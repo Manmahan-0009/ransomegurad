@@ -93,13 +93,18 @@ def extract_features(
 
         # Entropy measurement for created or modified files
         if evt_type in ["created", "modified"] and src_rel:
-            abs_path = demo_dir / src_rel
-            ent = calculate_file_entropy(abs_path)
-            if ent is not None:
-                entropy_readings.append(ent)
-                delta = tracker.update_entropy(src_rel, ent)
-                if delta is not None:
-                    entropy_deltas.append(delta)
+            if evt.entropy is not None:
+                entropy_readings.append(evt.entropy)
+                if evt.entropy_delta is not None:
+                    entropy_deltas.append(evt.entropy_delta)
+            else:
+                abs_path = demo_dir / src_rel
+                ent = calculate_file_entropy(abs_path)
+                if ent is not None:
+                    entropy_readings.append(ent)
+                    delta = tracker.update_entropy(src_rel, ent)
+                    if delta is not None:
+                        entropy_deltas.append(delta)
 
     # Derived aggregations
     writes_per_second = round((files_created + files_modified) / window_seconds, 4)

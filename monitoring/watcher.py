@@ -3,7 +3,7 @@ RansomGuard - Real-Time Filesystem Event Watcher (monitoring/watcher.py)
 
 Uses Python's watchdog library to observe sandbox/demo_folder.
 Logs file operations (CREATE, MODIFY, MOVE, DELETE) and converts them
-into StructuredEvent objects pushed to the EventQueue.
+into StructuredEvent objects pushed to the EventQueue with live entropy calculations.
 """
 
 import os
@@ -27,6 +27,7 @@ except ImportError:
 
 from utils.sandbox_manager import get_demo_dir
 from monitoring.event_schema import create_structured_event, StructuredEvent
+from features.entropy import calculate_file_entropy, get_entropy_tracker
 
 
 class RansomGuardHandler(FileSystemEventHandler):
@@ -34,7 +35,7 @@ class RansomGuardHandler(FileSystemEventHandler):
     Custom Watchdog Event Handler.
     Translates OS filesystem notifications into:
     1. Human-readable timestamped console output (Stage 1 compatibility).
-    2. Normalized StructuredEvent instances dispatched to queue_callback (Stage 2).
+    2. Normalized StructuredEvent instances dispatched to queue_callback (Stage 2 & 3).
     """
 
     def __init__(
@@ -84,12 +85,23 @@ class RansomGuardHandler(FileSystemEventHandler):
         dest_rel = self._format_rel_path(dest_path_str) if dest_path_str else None
         abs_file = Path(src_path_str)
 
-        # Build structured event
+        # Calculate live entropy for created or modified files
+        ent_val = None
+        ent_delta = None
+        if event_type in ["created", "modified"]:
+            ent_val = calculate_file_entropy(abs_file)
+            if ent_val is not None:
+                tracker = get_entropy_tracker()
+                ent_delta = tracker.update_entropy(src_rel, ent_val)
+
+        # Build structured event with persisted entropy fields
         struct_evt = create_structured_event(
             event_type=event_type,
             src_rel_path=src_rel,
             dest_rel_path=dest_rel,
             abs_file_path=abs_file,
+            entropy=ent_val,
+            entropy_delta=ent_delta,
         )
 
         # Stage 1 Console Print Output
@@ -105,7 +117,7 @@ class RansomGuardHandler(FileSystemEventHandler):
                 print(f"[{ts}] [WATCHER] DELETE  {src_rel}")
             sys.stdout.flush()
 
-        # Stage 2 Queue Dispatch
+        # Stage 2 & 3 Queue Dispatch
         if self.queue_callback:
             try:
                 self.queue_callback(struct_evt)
