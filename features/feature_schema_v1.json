@@ -1,0 +1,65 @@
+{
+  "version": "v1",
+  "window_seconds": 5,
+  "stride_seconds": 1,
+  "dedupe_ms": 200,
+  "features": [
+    {
+      "name": "files_created",
+      "type": "integer",
+      "description": "Number of file creation events in the window"
+    },
+    {
+      "name": "files_modified",
+      "type": "integer",
+      "description": "Number of file modification events in the window"
+    },
+    {
+      "name": "files_deleted",
+      "type": "integer",
+      "description": "Number of file deletion events in the window"
+    },
+    {
+      "name": "files_renamed",
+      "type": "integer",
+      "description": "Number of file rename/move events in the window"
+    },
+    {
+      "name": "writes_per_second",
+      "type": "float",
+      "description": "(files_created + files_modified) divided by window_seconds"
+    },
+    {
+      "name": "unique_extensions",
+      "type": "integer",
+      "description": "Count of distinct file extensions touched in the window"
+    },
+    {
+      "name": "unique_directories",
+      "type": "integer",
+      "description": "Count of distinct parent directories touched in the window"
+    },
+    {
+      "name": "extension_change_count",
+      "type": "integer",
+      "description": "Count of move events where source extension differs from destination extension"
+    },
+    {
+      "name": "rename_ratio",
+      "type": "float",
+      "description": "files_renamed divided by total_events in window"
+    },
+    {
+      "name": "mean_entropy",
+      "type": "float",
+      "description": "Mean Shannon entropy (0.0 to 8.0) of files modified/created in window"
+    },
+    {
+      "name": "entropy_change",
+      "type": "float",
+      "description": "Mean entropy change delta across modified files in window"
+    }
+  ],
+  "entropy_delta_method": "mean_difference_from_previous_sample",
+  "notes": "Stage 2 Schema for RansomGuard behavioral feature extraction."
+}

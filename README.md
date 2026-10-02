@@ -1,6 +1,7 @@
 # RansomGuard 🛡️
 
-**Stage 1 — Safe Filesystem Simulation & Monitoring**
+**Stage 1 — Safe Filesystem Simulation & Monitoring**  
+**Stage 2 — Event Processing & Behavioral Feature Extraction**
 
 RansomGuard is an open-source, educational cybersecurity hackathon prototype designed to observe, analyze, and detect ransomware-like behavior on local filesystems.
 
@@ -8,22 +9,58 @@ RansomGuard is an open-source, educational cybersecurity hackathon prototype des
 
 ---
 
-## 🎯 Current Stage Scope (Stage 1)
+## 🏗️ Architecture Pipeline
 
-### What RansomGuard Currently Does:
-- **Isolated Sandbox Management**: Resets a clean demonstration directory (`sandbox/demo_folder`) from template files (`sandbox/templates`).
-- **Path-Safety Enforcement**: Every file operation strictly validates destination paths via `utils.sandbox_manager.is_safe_path()` to prevent out-of-sandbox modifications.
-- **Real-Time Event Monitoring**: Uses Python `watchdog` to monitor filesystem events (`CREATE`, `MODIFY`, `MOVE`, `DELETE`) with precise timestamps.
-- **Harmless Normal User Simulator**: Simulates ordinary, slow user file interactions (low-frequency edits, document creation, renames, temporary file deletions).
-- **Benign Ransomware-like Behavior Simulator**: Safely mimics rapid burst file modifications, high-entropy pseudo-random content overwrites, and extension changes (`.locked`).
+### Stage 1 Pipeline (Raw Monitoring)
+```text
+Normal / Attack-like Simulator → sandbox/demo_folder → Watchdog Observer → Console Log
+```
 
-### What RansomGuard Deliberately Does NOT Do Yet (Planned for Future Stages):
-- ❌ No Machine Learning models (Isolation Forest / Random Forest)
-- ❌ No 5-second sliding window feature extraction
-- ❌ No real-time process containment or file locking
-- ❌ No Streamlit / FastAPI web dashboards
-- ❌ No eBPF / Kernel probes
-- ❌ No external network communication
+### Stage 2 Pipeline (Behavioral Feature Extraction Engine)
+```text
+Watchdog Observer 
+       ↓
+StructuredEvent (event_schema.py)
+       ↓
+EventQueue (event_queue.py)
+       ↓
+Deduplication (deduplicator.py, 200ms window)
+       ↓
+5-second Sliding Window / 1-second Stride (sliding_window.py)
+       ↓
+Shared Feature Extractor (extractor.py & entropy.py)
+       ↓
+11-Dimensional Feature Vector printed every second
+```
+
+---
+
+## 🎯 Stage 2 Core Concepts Explained
+
+1. **Structured Event (`StructuredEvent`)**: Converts raw OS filesystem notifications into standard dictionary records (`event_time`, `event_type`, `src_path`, `dest_path`, `extension`, `file_size`).
+2. **Event Queue (`EventQueue`)**: A non-blocking `queue.Queue` buffer ensuring the Watchdog callback thread returns instantly without being delayed by entropy calculations.
+3. **Deduplication (`EventDeduplicator`)**: Filters out repetitive OS modification events emitted within a 200ms burst while preserving critical creation, deletion, and rename sequences.
+4. **Sliding Window (`SlidingWindowBuffer`)**: Maintains active events from the preceding 5 seconds and advances every 1 second (stride).
+5. **Shannon Entropy (`calculate_file_entropy`)**: Measures byte-level randomness (0.0 to 8.0 bits/byte). Plaintext files typically measure 3.5–5.0; encrypted data measures ~7.9+.
+6. **Feature Extractor (`extract_features()`)**: A single, unified function that calculates an 11-dimensional behavioral feature vector from windowed events.
+
+---
+
+## 📊 Feature Vector Definition (`feature_schema_v1.json`)
+
+| Feature Name | Type | Description |
+| :--- | :--- | :--- |
+| `files_created` | Integer | Count of file creation events in 5s window |
+| `files_modified` | Integer | Count of file modification events in 5s window |
+| `files_deleted` | Integer | Count of file deletion events in 5s window |
+| `files_renamed` | Integer | Count of file rename (`MOVE`) events in 5s window |
+| `writes_per_second` | Float | `(files_created + files_modified) / 5.0` |
+| `unique_extensions` | Integer | Count of distinct file extensions touched in window |
+| `unique_directories` | Integer | Count of distinct parent directories touched in window |
+| `extension_change_count` | Integer | Count of renames where source extension != destination extension |
+| `rename_ratio` | Float | `files_renamed / total_events` in window |
+| `mean_entropy` | Float | Average Shannon entropy (0.0 to 8.0) of created/modified files |
+| `entropy_change` | Float | Average entropy delta comparing current file state to baseline |
 
 ---
 
@@ -33,24 +70,36 @@ RansomGuard is an open-source, educational cybersecurity hackathon prototype des
 ransomguard/
 ├── monitoring/
 │   ├── __init__.py               # Monitoring package initializer
-│   └── watcher.py                # Watchdog real-time event observer
+│   ├── watcher.py                # Watchdog real-time event observer
+│   ├── event_schema.py           # Standardized StructuredEvent dataclass
+│   ├── event_queue.py            # Non-blocking thread-safe EventQueue
+│   └── deduplicator.py           # 200ms event deduplication filter
+├── windowing/
+│   ├── __init__.py               # Windowing package initializer
+│   └── sliding_window.py         # 5-second sliding window / 1-second stride buffer
+├── features/
+│   ├── __init__.py               # Features package initializer
+│   ├── extractor.py              # Shared 11-dimensional feature extractor
+│   ├── entropy.py                # Safe Shannon entropy calculator & tracker
+│   └── feature_schema_v1.json    # JSON schema defining feature vector specifications
 ├── simulator/
 │   ├── __init__.py               # Simulator package initializer
-│   ├── normal_simulator.py       # Simulates slow, ordinary user file actions
-│   ├── attack_simulator.py       # Safely simulates ransomware-like burst file actions
-│   └── simulator_utils.py        # Shared path-safe filesystem helpers
+│   ├── normal_simulator.py       # Low-frequency harmless user action simulator
+│   ├── attack_simulator.py       # Safe ransomware-like behavior simulator
+│   └── simulator_utils.py        # Path-safe reusable helper functions
 ├── utils/
 │   ├── __init__.py               # Utils package initializer
-│   └── sandbox_manager.py        # Single source of truth for path safety & sandbox reset
+│   └── sandbox_manager.py        # Single source of truth for path safety & reset logic
 ├── sandbox/
-│   ├── templates/                # Reference template files & subdirectories
-│   └── demo_folder/              # Active simulation sandbox folder
+│   ├── templates/                # Reference template directory
+│   └── demo_folder/              # Isolated demo execution directory
 │       └── .gitkeep
-├── stage1_selfcheck.py           # Static diagnostic validation tool
+├── stage1_selfcheck.py           # Stage 1 static diagnostic tool
+├── stage2_selfcheck.py           # Stage 2 static diagnostic tool
 ├── reset_sandbox.py              # Root reset wrapper script
-├── requirements.txt              # Stage 1 dependencies (watchdog)
-├── README.md                     # Documentation & setup guide
-├── main.py                       # CLI Control Launcher
+├── requirements.txt              # Project dependencies (watchdog)
+├── README.md                     # Documentation & manual test instructions
+├── main.py                       # Main CLI Control Launcher
 └── .gitignore                    # Git exclusion rules
 ```
 
@@ -58,119 +107,96 @@ ransomguard/
 
 ## 🚀 Setup Instructions (Kali Linux / Linux / macOS / Windows)
 
-### 1. Copy or Clone the Project
-Transfer the `ransomguard` folder to your target machine (e.g., Kali Linux VM).
-
 ```bash
 cd ransomguard
-```
-
-### 2. Create and Activate Virtual Environment
-```bash
 python3 -m venv venv
 source venv/bin/activate
-```
-*(On Windows PowerShell: `.\venv\Scripts\Activate.ps1`)*
-
-### 3. Install Dependencies
-```bash
 pip install -r requirements.txt
+python3 main.py reset
 ```
 
 ---
 
-## 🧪 Manual Two-Terminal Test Procedure
+## 🧪 Stage 2 Manual Testing Procedure (Two-Terminal Setup)
 
-### Step 1: Initialize the Sandbox
-In any terminal, run:
+### Step 1: Start Live Feature Monitor (Terminal 1)
+Open **Terminal 1** and start the live feature monitor:
 ```bash
-python main.py reset
+python main.py features
 ```
-*Expected Output:*
-```text
-[SANDBOX] Reset started
-[SANDBOX] Copied 25 template files
-[SANDBOX] Ready
-```
-
----
-
-### Step 2: Start the Filesystem Observer (Terminal 1)
-Open **Terminal 1** and start the Watchdog monitor:
-```bash
-python main.py watch
-```
-*Expected Output:*
+*Console Header:*
 ```text
 ==================================================
-      RANSOMGUARD WATCHDOG MONITOR ACTIVE        
- Target Directory: /home/kali/ransomguard/sandbox/demo_folder
+     RANSOMGUARD LIVE FEATURE MONITOR ACTIVE      
+ Target Directory: /path/to/ransomguard/sandbox/demo_folder
+ Window: 5.0s | Stride: 1.0s | Dedupe: 200ms
  Press Ctrl+C to terminate monitor.
 ==================================================
 ```
 
 ---
 
-### Step 3: Run Normal User Simulation (Terminal 2)
-Keep **Terminal 1** running. Open **Terminal 2** and execute:
+### Step 2: Run Normal Simulation (Terminal 2)
+In **Terminal 2**, run:
 ```bash
 python main.py normal --duration 15 --seed 42
 ```
 
-**Observed Stream in Terminal 1 (Normal Stream):**
-> Events arrive **slowly** with gaps of ~2 seconds:
+**Observed Output in Terminal 1 (Baseline Low-Activity Features):**
 ```text
-[10:45:02] [WATCHER] MODIFY  report1.txt
-[10:45:04] [WATCHER] CREATE  user_note_1_482.txt
-[10:45:06] [WATCHER] MOVE    notes1.txt -> notes1_renamed.txt
-[10:45:08] [WATCHER] DELETE  user_note_1_482.txt
+[10:45:05] [FEATURE WINDOW]
+  files_created            : 1
+  files_modified           : 1
+  files_deleted            : 0
+  files_renamed            : 0
+  writes_per_second        : 0.4000
+  unique_extensions        : 1
+  unique_directories       : 1
+  extension_change_count   : 0
+  rename_ratio             : 0.0000
+  mean_entropy             : 4.1250
+  entropy_change           : 0.0000
 ```
 
 ---
 
-### Step 4: Run Ransomware-like Attack Simulator (Terminal 2)
-Reset the sandbox in **Terminal 2**:
+### Step 3: Run Ransomware-like Attack Simulation (Terminal 2)
+In **Terminal 2**, reset and launch the attack burst:
 ```bash
 python main.py reset
-```
-
-Now launch the safe ransomware-like behavior simulator in **Terminal 2**:
-```bash
 python main.py attack --speed medium --seed 42
 ```
-*(Options for speed: `--speed slow`, `--speed medium`, `--speed fast`)*
 
-**Observed Stream in Terminal 1 (Attack Burst Stream):**
-> Events arrive in a **dense, rapid stream** with high modification and `.locked` extension renames:
+**Observed Output in Terminal 1 (High-Activity Burst Features):**
 ```text
-[10:46:10] [WATCHER] MODIFY  report1.txt
-[10:46:10] [WATCHER] MOVE    report1.txt -> report1.txt.locked
-[10:46:10] [WATCHER] MODIFY  report2.txt
-[10:46:10] [WATCHER] MOVE    report2.txt -> report2.txt.locked
-[10:46:11] [WATCHER] MODIFY  data1.csv
-[10:46:11] [WATCHER] MOVE    data1.csv -> data1.csv.locked
-...
-[ATTACK-LIKE] Simulation complete
+[10:46:12] [FEATURE WINDOW]
+  files_created            : 0
+  files_modified           : 14
+  files_deleted            : 0
+  files_renamed            : 14
+  writes_per_second        : 2.8000
+  unique_extensions        : 3
+  unique_directories       : 2
+  extension_change_count   : 14
+  rename_ratio             : 0.5000
+  mean_entropy             : 7.9420
+  entropy_change           : 3.8170
 ```
+
+> **Notice the clear contrast:**
+> - **Attack Burst**: High `writes_per_second` (2.8+), high `extension_change_count` (14), high `rename_ratio` (0.50), and high `mean_entropy` (~7.94 bits/byte).
+> - **Normal Activity**: Low event count, zero extension changes, low entropy.
 
 ---
 
-## 🛡️ Path Safety & Constraints
+## 📋 Stage 2 Verification Checklist
 
-Every file operation passes through `utils.sandbox_manager.is_safe_path()`. If a path resolves outside `sandbox/demo_folder`, execution halts immediately with a `RuntimeError`:
-
-```text
-[FATAL PATH SAFETY ERROR] Attempted operation outside sandbox!
-```
-
----
-
-## 📋 Stage 1 Completion Verification Checklist
-
-- [ ] Sandbox resets successfully
-- [ ] Templates remain unchanged
-- [ ] Watcher monitors only demo_folder
-- [ ] Normal simulator produces low-frequency events
-- [ ] Attack-like simulator produces dense events
-- [ ] No operation escapes the sandbox
-- [ ] Stage 1 contains no ML/dashboard/network logic
+- [ ] Stage 1 commands (`reset`, `watch`, `normal`, `attack`) continue working without issues.
+- [ ] `main.py features` runs without errors.
+- [ ] Structured events contain relative paths, event types, extensions, and file sizes.
+- [ ] Watchdog callbacks push events to `EventQueue` without blocking.
+- [ ] Deduplicator filters repetitive `modified` events within 200ms.
+- [ ] Sliding window maintains events from the previous 5 seconds and updates every 1 second.
+- [ ] `extract_features()` produces an 11-dimensional feature vector matching `feature_schema_v1.json`.
+- [ ] Shannon entropy accurately calculates file randomness (0.0 to 8.0).
+- [ ] No Machine Learning classifiers or detection scores added yet.
