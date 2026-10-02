@@ -1,0 +1,7 @@
+{
+  "environment": "production",
+  "db_port": 5432,
+  "max_connections": 100,
+  "ssl_enabled": true,
+  "cluster_name": "us-east-prod-1"
+}

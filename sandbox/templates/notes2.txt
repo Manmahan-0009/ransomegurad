@@ -1,0 +1,6 @@
+Brainstorming session for RansomGuard architecture.
+Key components:
+1. Monitoring with Watchdog
+2. Event Queue & Sliding Window (5s)
+3. Feature Extraction (Event count, Rename ratio, Extension entropy)
+4. ML Classifier / Rule Engine

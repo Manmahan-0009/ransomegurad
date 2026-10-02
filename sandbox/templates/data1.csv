@@ -1,0 +1,6 @@
+id,name,role,department,salary
+1,Alice,Engineer,Dev,95000
+2,Bob,Analyst,Data,85000
+3,Charlie,Manager,Dev,110000
+4,Diana,Security Lead,Sec,125000
+5,Evan,DevOps Engineer,Infra,98000

@@ -1,0 +1,5 @@
+Project RansomGuard Stage 2 Roadmap:
+- Event Queue buffer
+- 5-second sliding window feature extraction
+- Feature vector calculation (event rate, modification burst, extension entropy)
+- Isolation Forest ML model integration

@@ -1,0 +1,5 @@
+Annual Cyber Security Audit Summary.
+All systems patched and verified against standard vulnerabilities.
+- Firewall rules reviewed: OK
+- Endpoint protection status: Active
+- Backup replication status: Verified

@@ -1,0 +1,2 @@
+# RansomGuard Stage 1 Dependencies
+watchdog>=3.0.0

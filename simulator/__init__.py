@@ -1,0 +1,3 @@
+# RansomGuard Simulator Package
+from simulator.normal_simulator import run_normal_simulation
+from simulator.attack_simulator import run_attack_simulation

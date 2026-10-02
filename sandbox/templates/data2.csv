@@ -1,0 +1,5 @@
+timestamp,metric,value,status
+2026-10-01 10:00:00,cpu,42.5,OK
+2026-10-01 10:01:00,memory,68.1,OK
+2026-10-01 10:02:00,disk_io,12.4,OK
+2026-10-01 10:03:00,network_tx,1054,OK

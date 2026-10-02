@@ -1,0 +1,5 @@
+Meeting notes with client A.
+Discussed API integrations, SLA requirements, security posture.
+Action items:
+- Send OpenAPI spec by Friday
+- Set up sandbox staging environment

@@ -1,0 +1,6 @@
+Project RansomGuard Stage 1 Implementation Spec.
+Objectives:
+- Build safe sandbox reset mechanism
+- Implement real-time Watchdog event observer
+- Build normal user simulator and safe attack simulator
+- Verify path safety constraints
