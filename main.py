@@ -160,6 +160,31 @@ Examples:
     # Command: verify-stage3
     subparsers.add_parser("verify-stage3", help="Quickly verify existing Stage 3 artifacts without running simulations or regenerating data")
 
+    # Command: train
+    subparsers.add_parser("train", help="Train Stage 4 Random Forest model using run-grouped splits")
+
+    # Command: verify-model
+    subparsers.add_parser("verify-model", help="Verify trained model metrics against untouched test set")
+
+    # Command: serve
+    serve_parser = subparsers.add_parser(
+        "serve",
+        aliases=["server"],
+        help="Launch FastAPI backend server with REST & WebSocket endpoints"
+    )
+    serve_parser.add_argument("--host", default="127.0.0.1", help="Host address (default: 127.0.0.1)")
+    serve_parser.add_argument("--port", type=int, default=8000, help="Port number (default: 8000)")
+
+    # Command: live-detect
+    detect_parser = subparsers.add_parser(
+        "live-detect",
+        aliases=["detect", "bridge"],
+        help="Start Stage 2 live telemetry bridge to FastAPI backend"
+    )
+    detect_parser.add_argument("--api-url", default="http://127.0.0.1:8000/predict", help="Backend API URL (default: http://127.0.0.1:8000/predict)")
+    detect_parser.add_argument("--window", type=float, default=5.0, help="Window size in seconds (default: 5.0)")
+    detect_parser.add_argument("--stride", type=float, default=1.0, help="Stride step in seconds (default: 1.0)")
+
     args = parser.parse_args()
 
     if args.command == "reset":
@@ -188,9 +213,32 @@ Examples:
         validate_dataset_and_splits()
     elif args.command == "verify-stage3":
         run_stage3_quick_verification()
+    elif args.command == "train":
+        from training.train_model import main as train_main
+        train_main()
+    elif args.command == "verify-model":
+        import subprocess
+        subprocess.run([sys.executable, str(PROJECT_ROOT / "training" / "verify_model.py")])
+    elif args.command in ["serve", "server"]:
+        try:
+            import uvicorn
+        except ImportError:
+            print("\n==================================================")
+            print(" [ERROR] The 'uvicorn' package is not installed.")
+            print(" Please install it by running:")
+            print("     pip install -r requirements.txt")
+            print("  or:")
+            print("     pip install uvicorn")
+            print("==================================================\n")
+            sys.exit(1)
+        uvicorn.run("backend.app.main:app", host=args.host, port=args.port, reload=True)
+    elif args.command in ["live-detect", "detect", "bridge"]:
+        from detection.live_telemetry_bridge import start_live_telemetry_bridge
+        start_live_telemetry_bridge(api_url=args.api_url, window_seconds=args.window, stride_seconds=args.stride)
     else:
         parser.print_help()
 
 
 if __name__ == "__main__":
     main()
+

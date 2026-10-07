@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>RansomGuard | Threat Command Center</title>
+
+    <!-- RansomGuard Dashboard CSS -->
+    <link
+        rel="stylesheet"
+        href="/static/style.css"
+    >
+
+</head>
+
+
+<body>
+
+    <div class="app">
+
+
+        <!-- ================================================= -->
+        <!-- HEADER -->
+        <!-- ================================================= -->
+
+        <header class="topbar">
+
+            <div class="brand">
+
+                <div class="brand-icon">
+                    🛡️
+                </div>
+
+                <div>
+
+                    <h1>
+                        RANSOMGUARD
+                    </h1>
+
+                    <p>
+                        REAL-TIME THREAT COMMAND CENTER
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="system-status">
+
+                <span class="status-dot"></span>
+
+                <span id="connectionStatus">
+                    SYSTEM ONLINE
+                </span>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- ================================================= -->
+        <!-- MAIN DASHBOARD -->
+        <!-- ================================================= -->
+
+        <main class="dashboard">
+
+
+            <!-- ================================================= -->
+            <!-- THREAT SCORE -->
+            <!-- ================================================= -->
+
+            <section class="score-card">
+
+                <div class="card-header">
+
+                    <span>
+                        THREAT SCORE
+                    </span>
+
+                    <span class="live-label">
+                        ● LIVE
+                    </span>
+
+                </div>
+
+
+                <div class="score-content">
+
+
+                    <div class="score-circle">
+
+                        <span id="threatScore">
+                            0
+                        </span>
+
+                        <small>
+                            / 100
+                        </small>
+
+                    </div>
+
+
+                    <div class="threat-status">
+
+                        <span class="label">
+                            CURRENT STATUS
+                        </span>
+
+                        <h2 id="threatStatus">
+                            NO ACTIVE THREAT
+                        </h2>
+
+                        <p id="severity">
+                            Severity: LOW
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ================================================= -->
+            <!-- AI DETECTION -->
+            <!-- ================================================= -->
+
+            <section class="info-card">
+
+                <div class="card-header">
+
+                    <span>
+                        AI DETECTION
+                    </span>
+
+                    <span>
+                        🤖 ML
+                    </span>
+
+                </div>
+
+
+                <div class="metric">
+
+                    <span>
+                        Prediction
+                    </span>
+
+                    <strong id="prediction">
+                        BENIGN
+                    </strong>
+
+                </div>
+
+
+                <div class="metric">
+
+                    <span>
+                        Threat Probability
+                    </span>
+
+                    <strong id="threatProbability">
+                        0%
+                    </strong>
+
+                </div>
+
+
+                <div class="metric">
+
+                    <span>
+                        Benign Probability
+                    </span>
+
+                    <strong id="benignProbability">
+                        100%
+                    </strong>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ================================================= -->
+            <!-- RULE ENGINE -->
+            <!-- ================================================= -->
+
+            <section class="info-card">
+
+                <div class="card-header">
+
+                    <span>
+                        RULE ENGINE
+                    </span>
+
+                    <span>
+                        📏 RULES
+                    </span>
+
+                </div>
+
+
+                <div class="metric">
+
+                    <span>
+                        Rule Score
+                    </span>
+
+                    <strong id="ruleScore">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="metric">
+
+                    <span>
+                        Rules Triggered
+                    </span>
+
+                    <strong id="rulesTriggered">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="metric">
+
+                    <span>
+                        Detection Mode
+                    </span>
+
+                    <strong>
+                        HYBRID
+                    </strong>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ================================================= -->
+            <!-- LIVE SECURITY EVENT -->
+            <!-- ================================================= -->
+
+            <section class="alert-card">
+
+                <div class="card-header">
+
+                    <span>
+                        LIVE SECURITY EVENT
+                    </span>
+
+                    <span id="eventIndicator">
+                        WAITING
+                    </span>
+
+                </div>
+
+
+                <div class="alert-content">
+
+                    <div
+                        class="alert-icon"
+                        id="alertIcon"
+                    >
+                        🟢
+                    </div>
+
+
+                    <div>
+
+                        <h2 id="alertTitle">
+                            System Monitoring
+                        </h2>
+
+                        <p id="alertMessage">
+                            RansomGuard is waiting for
+                            telemetry events.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ================================================= -->
+            <!-- TRIGGERED RULES -->
+            <!-- ================================================= -->
+
+            <section class="rules-card">
+
+                <div class="card-header">
+
+                    <span>
+                        TRIGGERED RULES
+                    </span>
+
+                    <span id="ruleCount">
+                        0 RULES
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="rulesList"
+                    class="rules-list"
+                >
+
+                    <div class="empty-state">
+                        No rules triggered.
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- ================================================= -->
+            <!-- BEHAVIORAL TELEMETRY -->
+            <!-- ================================================= -->
+
+            <section class="features-card">
+
+                <div class="card-header">
+
+                    <span>
+                        BEHAVIORAL TELEMETRY
+                    </span>
+
+                    <span>
+                        📊 11 FEATURES
+                    </span>
+
+                </div>
+
+
+                <div id="featuresGrid" class="features-grid">
+
+                    <div class="feature-item">
+                        <span class="feature-label">Files Created</span>
+                        <span class="feature-value" id="feat_files_created">0</span>
+                    </div>
+
+                    <div class="feature-item">
+                        <span class="feature-label">Files Modified</span>
+                        <span class="feature-value" id="feat_files_modified">0</span>
+                    </div>
+
+                    <div class="feature-item">
+                        <span class="feature-label">Files Deleted</span>
+                        <span class="feature-value" id="feat_files_deleted">0</span>
+                    </div>
+
+                    <div class="feature-item">
+                        <span class="feature-label">Files Renamed</span>
+                        <span class="feature-value" id="feat_files_renamed">0</span>
+                    </div>
+
+                    <div class="feature-item">
+                        <span class="feature-label">Writes/sec</span>
+                        <span class="feature-value" id="feat_writes_per_second">0.0</span>
+                    </div>
+
+                    <div class="feature-item">
+                        <span class="feature-label">Unique Extensions</span>
+                        <span class="feature-value" id="feat_unique_extensions">0</span>
+                    </div>
+
+                    <div class="feature-item">
+                        <span class="feature-label">Unique Directories</span>
+                        <span class="feature-value" id="feat_unique_directories">0</span>
+                    </div>
+
+                    <div class="feature-item">
+                        <span class="feature-label">Ext Changes</span>
+                        <span class="feature-value" id="feat_extension_change_count">0</span>
+                    </div>
+
+                    <div class="feature-item">
+                        <span class="feature-label">Rename Ratio</span>
+                        <span class="feature-value" id="feat_rename_ratio">0.00</span>
+                    </div>
+
+                    <div class="feature-item">
+                        <span class="feature-label">Mean Entropy</span>
+                        <span class="feature-value" id="feat_mean_entropy">0.000</span>
+                    </div>
+
+                    <div class="feature-item">
+                        <span class="feature-label">Entropy Change</span>
+                        <span class="feature-value" id="feat_entropy_change">0.000</span>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+
+            <!-- ================================================= -->
+            <!-- EVENT STREAM -->
+            <!-- ================================================= -->
+
+            <section class="event-card">
+
+                <div class="card-header">
+
+                    <span>
+                        EVENT STREAM
+                    </span>
+
+                    <span>
+                        LIVE
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="eventLog"
+                    class="event-log"
+                >
+
+                    <div class="log-entry">
+
+                        <span class="log-time">
+                            --:--:--
+                        </span>
+
+                        <span>
+                            Waiting for telemetry connection...
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+        </main>
+
+
+
+        <!-- ================================================= -->
+        <!-- FOOTER -->
+        <!-- ================================================= -->
+
+        <footer>
+
+            <span>
+                RANSOMGUARD
+            </span>
+
+            <span>
+                REAL-TIME BEHAVIORAL THREAT DETECTION
+            </span>
+
+            <span>
+                STATUS:
+                <strong>
+                    MONITORING
+                </strong>
+            </span>
+
+        </footer>
+
+
+    </div>
+
+
+
+    <!-- ================================================= -->
+    <!-- RANSOMGUARD JAVASCRIPT -->
+    <!-- ================================================= -->
+
+    <script src="/static/app.js"></script>
+
+</body>
+
+</html>

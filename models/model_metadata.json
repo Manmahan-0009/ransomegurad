@@ -1,0 +1,27 @@
+{
+  "model": "RandomForestClassifier",
+  "random_seed": 42,
+  "n_estimators": 200,
+  "class_weight": "balanced",
+  "feature_columns": [
+    "files_created",
+    "files_modified",
+    "files_deleted",
+    "files_renamed",
+    "writes_per_second",
+    "unique_extensions",
+    "unique_directories",
+    "extension_change_count",
+    "rename_ratio",
+    "mean_entropy",
+    "entropy_change"
+  ],
+  "target_column": "label",
+  "selected_threshold": 0.15000000000000002,
+  "train_rows": 48,
+  "validation_rows": 48,
+  "test_rows": 47,
+  "train_positive": 5,
+  "validation_positive": 5,
+  "test_positive": 5
+}

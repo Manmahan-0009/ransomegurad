@@ -1,0 +1,13 @@
+{
+  "extension_change_count": 0.22128109560185003,
+  "mean_entropy": 0.21588888549912552,
+  "unique_directories": 0.18628051449582653,
+  "unique_extensions": 0.15619911595133254,
+  "files_renamed": 0.10821949961195912,
+  "rename_ratio": 0.05054295556859226,
+  "entropy_change": 0.034883857446089,
+  "files_modified": 0.01331624201261914,
+  "writes_per_second": 0.008298263987201694,
+  "files_created": 0.005089569825403918,
+  "files_deleted": 2.38845674523162e-16
+}

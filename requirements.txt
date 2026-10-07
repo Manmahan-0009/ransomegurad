@@ -1,2 +1,11 @@
-# RansomGuard Stage 1 Dependencies
+# RansomGuard Core & Stage 4/5 Dependencies
 watchdog>=3.0.0
+pandas
+numpy
+scikit-learn
+joblib
+fastapi
+uvicorn
+pydantic
+requests
+websockets

@@ -3,17 +3,24 @@ venv/
 __pycache__/
 *.pyc
 *.pyo
-*.log.tmp
+.pytest_cache/
+.DS_Store
 
 sandbox/demo_folder/*
 !sandbox/demo_folder/.gitkeep
 
-data/datasets/*
-!data/datasets/.gitkeep
 data/raw_events/*
 !data/raw_events/.gitkeep
+
 data/run_metadata/*
 !data/run_metadata/.gitkeep
+
+data/datasets/*
+!data/datasets/.gitkeep
+
 data/splits/*
 !data/splits/.gitkeep
 
+*.locked
+
+models/*.joblib
