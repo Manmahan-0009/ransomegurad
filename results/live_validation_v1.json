@@ -1,0 +1,104 @@
+{
+  "normal": {
+    "scenario": "normal",
+    "max_rf_probability": 0.0,
+    "max_rule_score": 0,
+    "max_final_score": 0.0,
+    "max_raw_severity": "LOW",
+    "max_debounced_severity": "LOW",
+    "triggered_rules": [],
+    "feature_peaks": {
+      "files_created": 0,
+      "files_modified": 0,
+      "files_deleted": 0,
+      "files_renamed": 1,
+      "writes_per_second": 0.0,
+      "unique_extensions": 1,
+      "unique_directories": 1,
+      "extension_change_count": 0,
+      "rename_ratio": 1.0,
+      "mean_entropy": 0.0,
+      "entropy_change": 0.0
+    },
+    "timestamp": "2026-10-07T19:37:45.819207",
+    "config": {
+      "model_version": "rf_v1",
+      "feature_schema_version": "v1",
+      "rf_threshold": 0.15,
+      "ml_weight": 0.6,
+      "rule_weight": 0.4,
+      "min_rename_count": 5,
+      "consecutive_windows_required": 2
+    }
+  },
+  "benign": {
+    "scenario": "benign",
+    "max_rf_probability": 0.0,
+    "max_rule_score": 40,
+    "max_final_score": 16.0,
+    "max_raw_severity": "LOW",
+    "max_debounced_severity": "LOW",
+    "triggered_rules": [
+      "HIGH_WRITE_RATE",
+      "MASS_FILE_MODIFICATION"
+    ],
+    "feature_peaks": {
+      "files_created": 45,
+      "files_modified": 76,
+      "files_deleted": 0,
+      "files_renamed": 9,
+      "writes_per_second": 24.2,
+      "unique_extensions": 5,
+      "unique_directories": 3,
+      "extension_change_count": 0,
+      "rename_ratio": 0.0692,
+      "mean_entropy": 4.6207,
+      "entropy_change": 0.009
+    },
+    "timestamp": "2026-10-07T19:38:03.199060",
+    "config": {
+      "model_version": "rf_v1",
+      "feature_schema_version": "v1",
+      "rf_threshold": 0.15,
+      "ml_weight": 0.6,
+      "rule_weight": 0.4,
+      "min_rename_count": 5,
+      "consecutive_windows_required": 2
+    }
+  },
+  "attack": {
+    "scenario": "attack",
+    "max_rf_probability": 0.935,
+    "max_rule_score": 30,
+    "max_final_score": 68.1,
+    "max_raw_severity": "HIGH",
+    "max_debounced_severity": "MEDIUM",
+    "triggered_rules": [
+      "EXTENSION_CHANGES",
+      "MASS_FILE_MODIFICATION"
+    ],
+    "feature_peaks": {
+      "files_created": 0,
+      "files_modified": 38,
+      "files_deleted": 0,
+      "files_renamed": 19,
+      "writes_per_second": 7.6,
+      "unique_extensions": 8,
+      "unique_directories": 5,
+      "extension_change_count": 19,
+      "rename_ratio": 0.3333,
+      "mean_entropy": 6.9694,
+      "entropy_change": 0.0
+    },
+    "timestamp": "2026-10-07T19:38:06.894159",
+    "config": {
+      "model_version": "rf_v1",
+      "feature_schema_version": "v1",
+      "rf_threshold": 0.15,
+      "ml_weight": 0.6,
+      "rule_weight": 0.4,
+      "min_rename_count": 5,
+      "consecutive_windows_required": 2
+    }
+  }
+}

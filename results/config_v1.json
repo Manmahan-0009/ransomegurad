@@ -1,0 +1,27 @@
+{
+  "baseline_version": "v1",
+  "timestamp": "2026-10-07T19:45:00",
+  "model_version": "rf_v1",
+  "feature_schema_version": "v1",
+  "rf_threshold": 0.15,
+  "ml_weight": 0.60,
+  "rule_weight": 0.40,
+  "rule_thresholds": {
+    "writes_per_sec_thresh": 20.0,
+    "files_modified_thresh": 30,
+    "mean_entropy_thresh": 7.0,
+    "entropy_change_thresh": 1.5,
+    "ext_change_count_thresh": 3,
+    "rename_ratio_thresh": 0.50,
+    "min_rename_count": 5
+  },
+  "severity_thresholds": {
+    "medium_thresh": 30.0,
+    "high_thresh": 60.0,
+    "critical_thresh": 80.0
+  },
+  "debounce_config": {
+    "consecutive_windows_required": 2,
+    "immediate_critical_score": 85.0
+  }
+}

@@ -24,3 +24,6 @@ data/splits/*
 *.locked
 
 models/*.joblib
+
+logs/*
+!logs/.gitkeep

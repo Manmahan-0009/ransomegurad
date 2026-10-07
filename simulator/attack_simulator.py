@@ -39,22 +39,25 @@ def run_attack_simulation(
     seed: Optional[int] = None,
     run_id: Optional[str] = None,
     op_callback: Optional[Callable[[Dict[str, Any]], None]] = None,
+    stop_event: Optional[Any] = None,
 ) -> Dict[str, Any]:
     """
     Runs a safe ransomware-like burst simulation on files inside sandbox/demo_folder.
     Records ground-truth operation timestamps for Stage 3 dataset labeling.
+    Supports cooperative safe containment cancellation via stop_event.
 
     Returns:
         Dict[str, Any]: {
             'attack_start_time': Optional[float],
-            'ground_truth_ops': List[Dict[str, Any]]
+            'ground_truth_ops': List[Dict[str, Any]],
+            'contained': bool
         }
     """
     demo_dir = get_demo_dir()
 
     if not demo_dir.exists():
         print(f"[ATTACK-LIKE ERROR] Demo folder '{demo_dir}' does not exist! Please run reset first.")
-        return {"attack_start_time": None, "ground_truth_ops": []}
+        return {"attack_start_time": None, "ground_truth_ops": [], "contained": False}
 
     delay = SPEED_DELAYS.get(speed.lower(), 0.1)
     rng = random.Random(seed) if seed is not None else random
@@ -74,7 +77,7 @@ def run_attack_simulation(
 
     if not files:
         print("[ATTACK-LIKE] No unencrypted files found. Run reset to restore original files.")
-        return {"attack_start_time": None, "ground_truth_ops": []}
+        return {"attack_start_time": None, "ground_truth_ops": [], "contained": False}
 
     # Shuffle or limit target count
     rng.shuffle(files)
@@ -82,11 +85,17 @@ def run_attack_simulation(
 
     ground_truth_ops: List[Dict[str, Any]] = []
     attack_start_time: Optional[float] = None
+    contained_flag = False
 
     # Record attack start time immediately prior to first operation
     attack_start_time = time.time()
 
     for file_path in target_files:
+        if stop_event and stop_event.is_set():
+            print("\n[ATTACK-LIKE] Safe Containment Signal received! Stopping attack simulator immediately.")
+            contained_flag = True
+            break
+
         if not file_path.exists():
             continue
 
@@ -112,6 +121,11 @@ def run_attack_simulation(
 
         time.sleep(delay / 2)
 
+        if stop_event and stop_event.is_set():
+            print("\n[ATTACK-LIKE] Safe Containment Signal received! Stopping attack simulator immediately.")
+            contained_flag = True
+            break
+
         # Record Ground-Truth Operation 2: EXTENSION-CHANGE
         locked_name = file_path.name + ".locked"
         locked_rel_path = (file_path.parent / locked_name).relative_to(demo_dir)
@@ -133,10 +147,16 @@ def run_attack_simulation(
 
         time.sleep(delay / 2)
 
-    print("\n[ATTACK-LIKE] Simulation complete")
+    if contained_flag:
+        print("[ATTACK-LIKE] Simulator halted gracefully under safe containment.")
+    else:
+        print("\n[ATTACK-LIKE] Simulation complete")
+
     return {
         "attack_start_time": attack_start_time,
         "ground_truth_ops": ground_truth_ops,
+        "contained": contained_flag,
+        "total_target_files": len(target_files),
     }
 
 

@@ -1,0 +1,66 @@
+{
+  "project_title": "RansomGuard - Behavioral Ransomware Detection & Safe Containment System",
+  "statement_of_performance": "On the controlled synthetic held-out test set, RansomGuard achieved 100% precision and recall.",
+  "dataset": {
+    "total_runs": 30,
+    "normal_runs": 10,
+    "benign_runs": 10,
+    "attack_runs": 10,
+    "total_feature_windows": 482,
+    "split_breakdown": {
+      "train_windows": 285,
+      "validation_windows": 93,
+      "test_windows": 104
+    }
+  },
+  "model": {
+    "family": "RandomForestClassifier",
+    "version": "rf_v2",
+    "rf_threshold": 0.20,
+    "untouched_test_metrics": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "fpr": 0.0,
+      "confusion_matrix": {
+        "TN": 83,
+        "FP": 0,
+        "FN": 0,
+        "TP": 16
+      }
+    }
+  },
+  "live_detection": {
+    "scenarios": {
+      "normal": { "max_score": 0.35, "severity": "LOW", "false_alerts": 0 },
+      "benign_high_activity": { "max_score": 12.35, "severity": "LOW", "false_alerts": 0 },
+      "attack_burst": { "max_score": 79.00, "severity": "HIGH", "confirmed_alert": true }
+    },
+    "latencies": {
+      "TTD_raw_avg_seconds": 1.0877,
+      "TTD_confirmed_avg_seconds": 2.1567
+    }
+  },
+  "containment": {
+    "cancellation_scope": "controlled_attack_simulator_only",
+    "containment_success_rate": 1.0,
+    "average_containment_time_TTC_seconds": 0.0136,
+    "speed_breakdown": {
+      "slow": { "affected_files": 6, "protected_files": 14, "protected_pct": 70.0 },
+      "medium": { "affected_files": 19, "protected_files": 1, "protected_pct": 5.0 },
+      "fast": { "affected_files": 19, "protected_files": 1, "protected_pct": 5.0 }
+    }
+  },
+  "safety": {
+    "sandbox_only": true,
+    "no_arbitrary_process_killing": true,
+    "no_system_modification": true
+  },
+  "limitations": [
+    "Controlled synthetic environment using isolated sandbox",
+    "2-window debounce confirmation delay creates a trade-off between false-positive resistance and containment speed",
+    "High-speed burst attacks can outrun 2-window confirmation",
+    "Model performance on synthetic data does not guarantee universal real-world malware generalization"
+  ]
+}

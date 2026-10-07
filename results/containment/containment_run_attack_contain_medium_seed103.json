@@ -1,0 +1,25 @@
+{
+  "run_id": "attack_contain_medium_seed103",
+  "timestamp": "2026-10-07T20:47:39.382449",
+  "containment_status": "already_stopped",
+  "state": "CONTAINED",
+  "timestamps": {
+    "attack_start_time": 1791386257.2243767,
+    "raw_detection_time": 1791386258.313624,
+    "confirmed_alert_time": 1791386259.3820047,
+    "containment_request_time": 1791386259.382008,
+    "containment_complete_time": 1791386259.3820257
+  },
+  "metrics": {
+    "TTD_raw": 1.0892,
+    "TTD_confirmed": 2.1576,
+    "TTC": 0.0,
+    "total_response_time": 2.1576,
+    "files_affected_before_raw_detection": 11,
+    "files_affected_before_confirmed_alert": 19,
+    "files_affected_before_containment": 19,
+    "total_target_files": 20,
+    "files_protected": 1,
+    "percentage_files_protected": 5.0
+  }
+}

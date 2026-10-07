@@ -1,0 +1,25 @@
+{
+  "run_id": "attack_contain_slow_seed102",
+  "timestamp": "2026-10-07T20:47:21.821696",
+  "containment_status": "stopped_successfully",
+  "state": "CONTAINED",
+  "timestamps": {
+    "attack_start_time": 1791386238.5088632,
+    "raw_detection_time": 1791386240.664513,
+    "confirmed_alert_time": 1791386241.7275982,
+    "containment_request_time": 1791386241.727606,
+    "containment_complete_time": 1791386241.8211298
+  },
+  "metrics": {
+    "TTD_raw": 2.1556,
+    "TTD_confirmed": 3.2187,
+    "TTC": 0.0935,
+    "total_response_time": 3.3123,
+    "files_affected_before_raw_detection": 6,
+    "files_affected_before_confirmed_alert": 8,
+    "files_affected_before_containment": 8,
+    "total_target_files": 20,
+    "files_protected": 12,
+    "percentage_files_protected": 60.0
+  }
+}

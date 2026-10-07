@@ -1,190 +1,213 @@
 # RansomGuard 🛡️
 
-**Stage 1 — Safe Filesystem Simulation & Monitoring**  
-**Stage 2 — Event Processing & Behavioral Feature Extraction**  
-**Stage 3 — Automated Labeled Dataset Generation & Split Validation**
+**Behavioral Ransomware Detection & Safe Containment System**
 
-RansomGuard is an open-source, educational cybersecurity hackathon prototype designed to observe, analyze, and detect ransomware-like behavior on local filesystems.
+RansomGuard is an open-source, educational cybersecurity hackathon prototype designed to observe, analyze, detect, and safely contain ransomware-like filesystem behavior in real time.
 
-> ⚠️ **SAFETY NOTE:** This project contains **NO real malware, NO encryption algorithms, NO persistence mechanisms, NO privilege escalation, and NO network propagation**. All simulated file activity is strictly restricted to an isolated sandbox folder (`sandbox/demo_folder`).
+> ⚠️ **SAFETY & RESPONSIBLE DISCLOSURE DISCLAIMER:**  
+> This project contains **NO real malware, NO encryption algorithms, NO persistence mechanisms, NO privilege escalation, and NO network propagation**. All simulated file activity is strictly restricted to an isolated sandbox folder (`sandbox/demo_folder`). Safe containment is a **simulated cooperative thread halt** that strictly controls RansomGuard's internal attack simulator.
 
 ---
 
-## 🏗️ Multi-Stage Architecture Pipeline
+## 🏗️ Multi-Stage System Architecture
 
 ```text
-STAGE 1: SIMULATION & RAW MONITORING
-Normal / Benign / Attack-like Simulators → sandbox/demo_folder → Watchdog Observer
-
-STAGE 2: FEATURE EXTRACTION ENGINE
-Watchdog Events → StructuredEvent → EventQueue → Deduplication (200ms) → 5s Sliding Window / 1s Stride → extract_features()
-
-STAGE 3: DATASET GENERATION & SPLITTING PIPELINE
-Simulator Run (Pre-Obs → Sim → Post-Obs) → Raw Event JSONL + Metadata + Ground-Truth Ops → Replay through Stage 2 Pipeline → Timestamp-Based Labeling [window_start, window_end) → dataset_v1.csv → Grouped Split by run_id (60/20/20) → train.csv / validation.csv / test.csv
+                               ┌─────────────────────────────┐
+                               │  sandbox/demo_folder        │
+                               └──────────────┬──────────────┘
+                                              │
+                    ┌─────────────────────────┼─────────────────────────┐
+                    │                         │                         │
+            ┌───────┴───────┐         ┌───────┴───────┐         ┌───────┴───────┐
+            │    Normal     │         │    Benign     │         │  Attack Burst │
+            │  Simulator    │         │  Simulator    │         │   Simulator   │
+            └───────┬───────┘         └───────┬───────┘         └───────┬───────┘
+                    │                         │                         │
+                    └─────────────────────────┼─────────────────────────┘
+                                              │
+                                   ┌──────────┴──────────┐
+                                   │ Watchdog Observer   │
+                                   └──────────┬──────────┘
+                                              │ StructuredEvent
+                                   ┌──────────┴──────────┐
+                                   │     EventQueue      │
+                                   └──────────┬──────────┘
+                                              │
+                                   ┌──────────┴──────────┐
+                                   │ Deduplicator (200ms)│
+                                   └──────────┬──────────┘
+                                              │
+                                   ┌──────────┴──────────┐
+                                   │  5s Sliding Window  │
+                                   │   (1s Stride)       │
+                                   └──────────┬──────────┘
+                                              │
+                                   ┌──────────┴──────────┐
+                                   │ 11-Feature Extractor│
+                                   └──────────┬──────────┘
+                                              │
+                     ┌────────────────────────┴────────────────────────┐
+                     │                                                 │
+          ┌──────────┴──────────┐                           ┌──────────┴──────────┐
+          │    Random Forest    │                           │     Rule Engine     │
+          │     Model (v2)      │                           │  (6 Threshold Rules)│
+          └──────────┬──────────┘                           └──────────┬──────────┘
+                     │ ML Prob                                         │ Rule Score
+                     └────────────────────────┬────────────────────────┘
+                                              │ (70% ML / 30% Rules)
+                                   ┌──────────┴──────────┐
+                                   │  Hybrid Threat Score│
+                                   └──────────┬──────────┘
+                                              │
+                                   ┌──────────┴──────────┐
+                                   │  Debounce Engine    │
+                                   │ (2-Window Confirm)  │
+                                   └──────────┬──────────┘
+                                              │
+                                   ┌──────────┴──────────┐
+                                   │ CONFIRMED DETECTION │
+                                   └──────────┬──────────┘
+                                              │
+                     ┌────────────────────────┴────────────────────────┐
+                     │                                                 │
+          ┌──────────┴──────────┐                           ┌──────────┴──────────┐
+          │ WebSocket Broadcast │                           │ ContainmentManager  │
+          │  to Live Dashboard  │                           │(Safe Simulator Stop)│
+          └─────────────────────┘                           └─────────────────────┘
 ```
 
 ---
 
-## 🎯 Stage 3 Rationale & Core Concepts
+## 📊 11 Canonical Behavioral Features Explained
 
-### 1. Observation Lifecycle vs. Simulator Duration
-A critical requirement in Stage 3 is decoupling **simulator execution duration** from **monitoring observation duration**.
-If monitoring stops the exact millisecond a rapid simulator finishes (e.g. an attack burst completing in 0.8 seconds), total recorded time is shorter than the 5-second feature window, resulting in 0 generated feature rows!
+RansomGuard extracts 11 behavioral features per 5-second sliding window:
 
-**Standardized Observation Lifecycle:**
-- **0 – 3 sec (`PRE_OBSERVATION_SECONDS = 3.0`)**: Watchdog monitors baseline pre-activity state.
-- **3 – ~6 sec**: Simulator executes (normal, benign, or attack-like operations). Attack simulator records ground-truth timestamps immediately prior to each operation.
-- **~6 – 11 sec (`POST_OBSERVATION_SECONDS = 5.0`)**: Watchdog continues monitoring after simulator completes.
+1. **`files_created`**: Number of new files created. High during benign downloads/extracts, low during purely in-place ransomware encryption.
+2. **`files_modified`**: Number of existing files written to. High in both benign bulk editing and ransomware encryption.
+3. **`files_deleted`**: Number of files deleted. Indicates destructive wiper behavior.
+4. **`files_renamed`**: Number of file rename operations. Elevated during mass extensions changes.
+5. **`writes_per_second`**: Write operation frequency. Captures high-rate operational bursts.
+6. **`unique_extensions`**: Number of distinct file extensions observed.
+7. **`unique_directories`**: Number of distinct directory paths traversed. Indicates lateral directory scanning.
+8. **`extension_change_count`**: **Primary Ransomware Indicator.** Counts files renamed to `.locked` / `.crypto` / `.ransom`.
+9. **`rename_ratio`**: Ratio of renamed files to total affected files ($\frac{\text{files\_renamed}}{\text{total\_files}}$).
+10. **`mean_entropy`**: **Primary Encryption Indicator.** Average Shannon entropy (bits/byte) of written content ($[0.0, 8.0]$ scale). Encrypted content yields entropy $\ge 6.8$.
+11. **`entropy_change`**: Relative increase in Shannon entropy compared to pre-operation file state.
 
-This observation window guarantees multiple valid 5-second sliding feature windows covering baseline, transition, attack burst, and post-attack behavior.
-
-### 2. Why the `benign` High-Activity Class Matters
-Ransomware detectors that rely solely on event counts risk learning the naive heuristic:
-> *"High file activity = Ransomware"*
-
-The `benign` simulator (`simulator/benign_simulator.py`) generates harmless, high-frequency activity (bulk file copying, backup-style saves, mass text file creation, normal renames). This teaches future ML classifiers to distinguish between **legitimate high-activity workloads** and **ransomware-like attacks** (which exhibit high entropy and `.locked` extension changes).
-
-### 3. Why Grouped Splitting by `run_id` is Critical
-In a 5-second sliding window with a 1-second stride, consecutive windows from the same simulation run overlap heavily (by 80%).
-- ❌ **Naive Random Row Splitting**: Results in overlapping windows from the same run being placed into both `train.csv` and `test.csv`, causing severe **data leakage** and unrealistically high test accuracy.
-- ✅ **Grouped Splitting by `run_id`**: All window rows derived from a specific `run_id` stay strictly in **ONE** split (`train.csv`, `validation.csv`, or `test.csv`), guaranteeing completely unseen test evaluations. For a 3/3/3 pilot, each split receives exactly 1 normal run, 1 benign run, and 1 attack run.
-
-### 4. Timestamp-Based Window Labeling & Offline Entropy Parity
-- `normal` runs: `label = 0` (all windows).
-- `benign` runs: `label = 0` (all windows).
-- `attack` runs: `label = 1` **ONLY** if at least one ground-truth attack operation timestamp occurred within the window time interval `[window_start, window_end)`.
-- **Entropy Parity**: `StructuredEvent` objects store calculated Shannon entropy values live during monitoring. During offline replay, `extract_features()` reuses these persisted entropy values so entropy is never silently lost when files are renamed or deleted on disk.
+> **Why No Single Feature Alone Proves Ransomware:**  
+> High write rates occur during benign file copies. High file creation occurs during ZIP extraction. Extension changes occur during file renaming. Only the **hybrid fusion** of high Shannon entropy ($>6.8$), mass extension changes, and ML pattern matching reliably isolates ransomware encryption without false-positive alarms on benign operations.
 
 ---
 
-## 📁 Project Directory Architecture
+## ⚙️ Hybrid ML & Rule Detection Engine
 
-```text
-ransomguard/
-├── data/
-│   ├── raw_events/               # Raw event JSONL logs per run
-│   ├── run_metadata/             # Run JSON metadata & ground-truth attack ops
-│   ├── datasets/                 # Consolidated dataset_v1.csv
-│   └── splits/                   # train.csv, validation.csv, test.csv, split_manifest.json
-├── training/
-│   ├── __init__.py               # Training package initializer
-│   ├── generate_dataset.py       # Automated dataset generator orchestrator (--fresh mode support)
-│   ├── run_recorder.py           # Metadata, raw event & ground-truth recorder
-│   ├── label_windows.py          # Ground-truth timestamp-based window labeler
-│   ├── split_by_run.py           # Grouped stratified train/val/test splitter
-│   ├── dataset_validator.py      # Comprehensive dataset sanity validator
-│   ├── replay_consistency.py     # Live vs offline replay consistency validator
-│   └── verify_stage3.py          # Fast non-destructive Stage 3 quick verification
-├── monitoring/
-│   ├── __init__.py               # Monitoring package initializer
-│   ├── watcher.py                # Watchdog observer (dispatches StructuredEvent objects)
-│   ├── event_schema.py           # Standardized StructuredEvent dataclass with entropy fields
-│   ├── event_queue.py            # Non-blocking thread-safe EventQueue
-│   └── deduplicator.py           # 200ms event deduplication filter
-├── windowing/
-│   ├── __init__.py               # Windowing package initializer
-│   └── sliding_window.py         # 5-second sliding window / 1-second stride buffer
-├── features/
-│   ├── __init__.py               # Features package initializer
-│   ├── extractor.py              # Shared 11-dimensional feature extractor
-│   ├── entropy.py                # Safe Shannon entropy calculator & tracker
-│   └── feature_schema_v1.json    # JSON schema defining feature vector specifications
-├── simulator/
-│   ├── __init__.py               # Simulator package initializer
-│   ├── normal_simulator.py       # Low-frequency harmless user action simulator
-│   ├── benign_simulator.py       # High-frequency harmless benign workload simulator
-│   ├── attack_simulator.py       # Safe ransomware-like behavior simulator & ground-truth recorder
-│   └── simulator_utils.py        # Path-safe reusable helper functions
-├── utils/
-│   ├── __init__.py               # Utils package initializer
-│   └── sandbox_manager.py        # Single source of truth for path safety & reset logic
-├── sandbox/
-│   ├── templates/                # Reference template directory
-│   └── demo_folder/              # Isolated demo execution directory
-│       └── .gitkeep
-├── stage1_selfcheck.py           # Stage 1 static diagnostic tool
-├── stage2_selfcheck.py           # Stage 2 static diagnostic tool
-├── stage3_selfcheck.py           # Stage 3 static diagnostic tool
-├── reset_sandbox.py              # Root reset wrapper script
-├── requirements.txt              # Project dependencies (watchdog)
-├── README.md                     # Documentation & manual test instructions
-├── main.py                       # Main CLI Control Launcher
-└── .gitignore                    # Git exclusion rules
-```
+- **Random Forest Model (v2)**: Trained exclusively on `train.csv` (18 runs / 285 windows). Evaluates 11-dimensional behavioral vectors. Threshold set to `0.20`.
+- **Rule Engine**: Evaluates 6 deterministic behavioral rules (`HIGH_WRITE_RATE`, `MASS_FILE_MODIFICATION`, `HIGH_ENTROPY`, `ENTROPY_INCREASE`, `EXTENSION_CHANGES`, `HIGH_RENAME_ACTIVITY`).
+- **Hybrid Fusion**: $\text{Threat Score} = (0.70 \times \text{ML Prob} \times 100) + (0.30 \times \text{Rule Score})$.
+- **Debounce Engine**: Requires **2 consecutive sliding windows** with raw severity `HIGH` or `CRITICAL` before triggering a **CONFIRMED ALERT** (or immediate bypass if single-window score $\ge 85.0$).
 
 ---
 
-## 🚀 Setup & Testing Instructions (Kali Linux / Linux / Windows)
+## 🛡️ Safe Simulated Containment Architecture
+
+When a debounced **CONFIRMED ALERT** triggers:
+1. `ContainmentManager` receives the alert notification.
+2. `SimulatorController` issues a cooperative `stop_event.set()` signal.
+3. The RansomGuard attack simulator checks `stop_event.is_set()` before performing its next file write/rename and **halts immediately** ($\approx 40\text{ ms}$ latency).
+4. Detailed response metrics ($TTD_{raw}, TTD_{confirmed}, TTC$, files affected before detection vs. files protected) are logged to `results/containment/`.
+
+---
+
+## 🚀 Quick Start & Presentation Demo Command
 
 ### 1. Setup Environment
 ```bash
+git clone https://github.com/Manmahan-0009/ransomguard.git
 cd ransomguard
 python3 -m venv venv
-source venv/bin/activate
+source venv/bin/activate   # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
-python3 main.py reset
+python main.py reset
 ```
+
+### 2. Launch FastAPI Backend & Dashboard
+```bash
+python main.py serve
+```
+Open your browser at `http://127.0.0.1:8000` to access the live dashboard.
+
+### 3. Run Reproducible One-Command Containment Demo
+In a separate terminal:
+```bash
+python main.py demo-containment --speed slow --seed 42
+```
+*Output*: Resets sandbox, starts Watchdog monitoring, launches attack simulator, detects threat within 1.1s, confirms threat at 2.19s, fires safe containment, halts simulator, and prints full timing & file protection metrics!
 
 ---
 
-### 2. Stage 3 Execution Steps
+## 📈 Audited Experimental Results Summary
 
-#### A. Run Stage 3 Static Self-Check
-Verifies all Stage 3 files, imports, observation timing constants, and schema alignments statically without executing simulations:
-```bash
-python3 stage3_selfcheck.py
-```
+### 1. Model Verification (Untouched Test Set — 99 Windows)
+- **Accuracy**: 1.0000 (100%)
+- **Precision**: 1.0000 (100%)
+- **Recall**: 1.0000 (100%)
+- **F1 Score**: 1.0000 (100%)
+- **ROC-AUC**: 1.0000 (100%)
 
-#### B. Generate Fresh 3/3/3 Pilot Dataset
-Automates sandbox reset, observation lifecycle (3s pre-obs, simulation, 5s post-obs), raw event recording, Stage 2 feature replay, timestamp labeling, and dataset export:
-```bash
-python3 main.py generate-data --all --runs-per-class 3 --seed 42 --fresh
-```
+> *Performance Statement*: On the controlled synthetic held-out test set, RansomGuard achieved 100% precision and recall.
 
-#### C. Perform Grouped Train/Val/Test Split
-Splits `dataset_v1.csv` by `run_id` into `train.csv` (1/1/1), `validation.csv` (1/1/1), and `test.csv` (1/1/1):
-```bash
-python3 main.py split-data --seed 42
-```
+### 2. Live Validation Baseline
+- **NORMAL**: Max threat score `0.35` (`LOW`), 0 false alerts.
+- **BENIGN (High-Activity Burst)**: Max threat score `12.35` (`LOW`), 0 false alerts. (Rules `HIGH_WRITE_RATE` and `MASS_FILE_MODIFICATION` trigger, but score remains LOW due to normal entropy and 0.005 ML probability).
+- **ATTACK**: Max threat score `79.00` (`HIGH`), debounced confirmed alert triggered.
 
-#### D. Validate Dataset & Split Consistency
-Enforces strict checks (fails if 0 attack rows, 0 positive labels, missing classes, zero-window runs, or data leakage exist):
-```bash
-python3 main.py validate-data
-```
+### 3. Response Latencies & Protection Metrics
 
----
-
-### 3. Quick Stage 3 Re-Verification
-
-Use this when Stage 3 was already generated and you only want to confirm:
-- Artifacts still exist (raw events, metadata, ground-truth ops for every run)
-- Dataset has not changed (SHA-256 fingerprints of dataset_v1.csv, split_manifest.json, feature_schema_v1.json)
-- Labels and splits still pass all validator checks
-- Replay consistency holds (1 normal, 1 benign, 1 attack run replayed from saved raw events and compared against saved dataset rows)
-- Entropy values are present and non-zero
-- Window timestamps are ordered and valid
-- Attack operation timestamps fall within observation bounds
-
-**No simulators or dataset regeneration are performed.** This is a read-only diagnostic.
-
-```bash
-python3 main.py verify-stage3
-```
+| Metric | Slow Attack (0.4s/file) | Medium Attack (0.1s/file) | Fast Attack (0.02s/file) |
+| :--- | :--- | :--- | :--- |
+| **$TTD_{raw}$** | **1.104s** | **1.085s** | **1.074s** |
+| **$TTD_{confirmed}$** | **2.190s** | **2.148s** | **2.148s** |
+| **$TTC$ (Containment Time)** | **0.040s** | **< 0.001s** | **< 0.001s** |
+| **Files Affected** | **6 / 20** | 19 / 20 | 19 / 20 |
+| **Files Protected** | **14 / 20 (70.0%)** | 1 / 20 (5.0%) | 1 / 20 (5.0%) |
 
 ---
 
-## 📋 Stage 3 Acceptance Checklist
+## ⚖️ Trade-off Explanation: False-Positive Safety vs. Containment Speed
 
-- [ ] Stage 1 & 2 commands (`reset`, `watch`, `normal`, `benign`, `attack`, `features`) work cleanly.
-- [ ] Observation duration is decoupled from simulation duration (3s pre-observation baseline + 5s post-observation grace period).
-- [ ] Every run generates >0 feature window rows.
-- [ ] `attack_simulator.py` records ground-truth attack operation timestamps immediately before actions occur.
-- [ ] Raw events store persisted `entropy` and `entropy_delta` values to ensure offline replay parity.
-- [ ] Replay engine uses the **EXACT** Stage 2 pipeline (`EventDeduplicator` -> `SlidingWindowBuffer` -> `extract_features()`).
-- [ ] Window labels are `1` ONLY when ground-truth attack operations occur within `[window_start, window_end)`.
-- [ ] `generate-data --fresh` cleanly wipes previous dataset artifacts before generating new ones.
-- [ ] `split_by_run.py` splits rows strictly by `run_id` with ZERO data leakage across `train.csv`, `validation.csv`, and `test.csv` (each receiving 1 normal, 1 benign, 1 attack run for pilot).
-- [ ] `validate-data` passes all sanity checks and prints explicit counts.
-- [ ] `verify-stage3` passes all quick verification checks (fingerprints, artifacts, timestamps, entropy, replay, splits).
-- [ ] No Machine Learning models or classifiers trained yet.
+- **Slow Attack**: RansomGuard detects and confirms threat within 2.19s, halting the attack after only 6 files are affected and saving **70% of candidate files** (14/20).
+- **Medium / Fast Attack**: The detector identifies abnormal behavior in **1.08s** ($TTD_{raw}$). However, the 2-window confirmation delay requires **2.15s** ($TTD_{confirmed}$) to prevent false alarms during intense benign activity. At high burst speeds ($<0.05\text{s/file}$), the controlled attack burst completes candidate files before the 2.15s confirmation mark.
+
+---
+
+## 🎯 MITRE ATT&CK Contextual Mapping
+
+| Technique ID | Technique Name | RansomGuard Simulation Mapping |
+| :--- | :--- | :--- |
+| **T1486** | Data Encrypted for Impact | Simulated via pseudo-random high-entropy byte overwrites + `.locked` extension renaming. |
+| **T1083** | File and Directory Discovery | Simulated via recursive directory traversals in normal/benign workloads. |
+| **T1074** | Data Staged | Simulated via benign temporary file creations and log compression tasks. |
+
+---
+
+## ⚠️ Explicit System Limitations
+
+1. **Controlled Environment**: Evaluated strictly inside an isolated sandbox directory (`sandbox/demo_folder`).
+2. **Confirmation Latency Trade-off**: The 2-window (2.0s) debounce delay eliminates benign false alarms, but allows high-speed bursts to complete prior to confirmation.
+3. **Synthetic Behavior**: Evaluates filesystem behavior simulation, not raw malware binaries.
+4. **No Arbitrary Process Killing**: Safe containment halts only RansomGuard's internal attack simulator thread.
+5. **Filesystem Telemetry Only**: Does not monitor API hooks, memory signatures, or process trees.
+
+---
+
+## 🔮 Future Work & Roadmap
+
+- **Canary Files**: Decoy files placed in monitored directories to trigger zero-delay immediate containment.
+- **Process & EDR Telemetry**: Integration with Windows Event Logs / Sysmon / API hooking.
+- **Adaptive Confirmation Policy**: Dynamic window confirmation based on combined ML confidence and high-entropy extension changes.
+- **Enterprise SOAR/SIEM Integration**: Syslog / CEF alert forwarding.
+
+---
+
+## 📜 License
+MIT License. Created for educational and research purposes.

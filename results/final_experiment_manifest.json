@@ -1,0 +1,52 @@
+{
+  "experiment_id": "ransomguard_v2_final",
+  "timestamp": "2026-10-07T20:55:00",
+  "model_version": "rf_v2",
+  "feature_schema_version": "v1",
+  "dataset_fingerprint_sha256": "7866908eae121f106b760e94f83c9c039b269780cbf3e8ce30be201c08a4b3fc",
+  "dataset_summary": {
+    "total_independent_runs": 30,
+    "normal_runs": 10,
+    "benign_runs": 10,
+    "attack_runs": 10,
+    "total_feature_windows": 482,
+    "train_runs": 18,
+    "validation_runs": 6,
+    "test_runs": 6,
+    "split_strategy": "run_id_grouped"
+  },
+  "hyperparameters": {
+    "rf_n_estimators": 200,
+    "rf_class_weight": "balanced",
+    "rf_random_state": 42,
+    "selected_rf_threshold": 0.20
+  },
+  "rule_thresholds": {
+    "writes_per_sec_thresh": 20.0,
+    "files_modified_thresh": 30,
+    "mean_entropy_thresh": 7.0,
+    "entropy_change_thresh": 1.5,
+    "ext_change_count_thresh": 3,
+    "rename_ratio_thresh": 0.50,
+    "min_rename_count": 5
+  },
+  "hybrid_fusion": {
+    "ml_weight": 0.70,
+    "rule_weight": 0.30
+  },
+  "severity_boundaries": {
+    "low": "< 30.0",
+    "medium": "[30.0, 60.0)",
+    "high": "[60.0, 80.0)",
+    "critical": ">= 80.0"
+  },
+  "debounce_config": {
+    "consecutive_windows_required": 2,
+    "immediate_critical_score": 85.0
+  },
+  "containment_config": {
+    "auto_containment_enabled": true,
+    "target_scope": "controlled_simulator_only",
+    "cancellation_mechanism": "cooperative_threading_event_stop"
+  }
+}

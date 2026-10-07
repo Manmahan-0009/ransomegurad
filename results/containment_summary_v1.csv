@@ -1,0 +1,10 @@
+run_id,speed,seed,containment_status,TTD_raw,TTD_confirmed,TTC,files_raw,files_confirmed,files_contained,protection_pct,zero_post_ops
+attack_contain_slow_seed101,slow,101,stopped_successfully,1.0909,2.1737,0.1282,3,6,6,70.0,True
+attack_contain_slow_seed102,slow,102,stopped_successfully,2.1556,3.2187,0.0935,6,8,8,60.0,True
+attack_contain_slow_seed103,slow,103,stopped_successfully,1.0469,2.1001,0.1566,3,6,6,70.0,True
+attack_contain_medium_seed101,medium,101,already_stopped,1.0694,2.1421,0.0,11,19,19,5.0,True
+attack_contain_medium_seed102,medium,102,already_stopped,1.0857,2.1583,0.0,11,19,19,5.0,True
+attack_contain_medium_seed103,medium,103,already_stopped,1.0892,2.1576,0.0,11,19,19,5.0,True
+attack_contain_fast_seed101,fast,101,already_stopped,1.0754,2.138,0.0,19,19,19,5.0,True
+attack_contain_fast_seed102,fast,102,already_stopped,1.082,2.1593,0.0,19,19,19,5.0,True
+attack_contain_fast_seed103,fast,103,already_stopped,1.0654,2.1481,0.0001,19,19,19,5.0,True

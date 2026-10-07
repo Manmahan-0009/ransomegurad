@@ -1,0 +1,25 @@
+{
+  "run_id": "contain_demo_slow_1791386119",
+  "timestamp": "2026-10-07T20:45:21.963767",
+  "containment_status": "stopped_successfully",
+  "state": "CONTAINED",
+  "timestamps": {
+    "attack_start_time": 1791386119.7225766,
+    "raw_detection_time": 1791386120.8373697,
+    "confirmed_alert_time": 1791386121.9210823,
+    "containment_request_time": 1791386121.921089,
+    "containment_complete_time": 1791386121.9633362
+  },
+  "metrics": {
+    "TTD_raw": 1.1148,
+    "TTD_confirmed": 2.1985,
+    "TTC": 0.0423,
+    "total_response_time": 2.2408,
+    "files_affected_before_raw_detection": 3,
+    "files_affected_before_confirmed_alert": 6,
+    "files_affected_before_containment": 6,
+    "total_target_files": 20,
+    "files_protected": 14,
+    "percentage_files_protected": 70.0
+  }
+}

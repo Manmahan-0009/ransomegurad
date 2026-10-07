@@ -1,0 +1,70 @@
+{
+  "rule_config": {
+    "writes_per_sec_thresh": 20.0,
+    "files_modified_thresh": 30,
+    "mean_entropy_thresh": 7.0,
+    "entropy_change_thresh": 1.5,
+    "ext_change_count_thresh": 3,
+    "rename_ratio_thresh": 0.5,
+    "min_rename_count": 5
+  },
+  "train_triggers": {
+    "normal": {
+      "total_windows": 120,
+      "HIGH_WRITE_RATE": 0,
+      "MASS_FILE_MODIFICATION": 0,
+      "HIGH_ENTROPY": 0,
+      "ENTROPY_INCREASE": 0,
+      "EXTENSION_CHANGES": 0,
+      "HIGH_RENAME_ACTIVITY": 0
+    },
+    "benign": {
+      "total_windows": 120,
+      "HIGH_WRITE_RATE": 31,
+      "MASS_FILE_MODIFICATION": 58,
+      "HIGH_ENTROPY": 0,
+      "ENTROPY_INCREASE": 0,
+      "EXTENSION_CHANGES": 0,
+      "HIGH_RENAME_ACTIVITY": 0
+    },
+    "attack_positive": {
+      "total_windows": 42,
+      "HIGH_WRITE_RATE": 0,
+      "MASS_FILE_MODIFICATION": 16,
+      "HIGH_ENTROPY": 12,
+      "ENTROPY_INCREASE": 0,
+      "EXTENSION_CHANGES": 40,
+      "HIGH_RENAME_ACTIVITY": 0
+    }
+  },
+  "validation_triggers": {
+    "normal": {
+      "total_windows": 40,
+      "HIGH_WRITE_RATE": 0,
+      "MASS_FILE_MODIFICATION": 0,
+      "HIGH_ENTROPY": 0,
+      "ENTROPY_INCREASE": 0,
+      "EXTENSION_CHANGES": 0,
+      "HIGH_RENAME_ACTIVITY": 0
+    },
+    "benign": {
+      "total_windows": 40,
+      "HIGH_WRITE_RATE": 15,
+      "MASS_FILE_MODIFICATION": 17,
+      "HIGH_ENTROPY": 0,
+      "ENTROPY_INCREASE": 0,
+      "EXTENSION_CHANGES": 0,
+      "HIGH_RENAME_ACTIVITY": 0
+    },
+    "attack_positive": {
+      "total_windows": 10,
+      "HIGH_WRITE_RATE": 0,
+      "MASS_FILE_MODIFICATION": 8,
+      "HIGH_ENTROPY": 2,
+      "ENTROPY_INCREASE": 0,
+      "EXTENSION_CHANGES": 10,
+      "HIGH_RENAME_ACTIVITY": 0
+    }
+  },
+  "calibration_summary": "Rule set calibrated on TRAIN & VALIDATION. HIGH_RENAME_ACTIVITY requires both rename_ratio >= 0.50 and files_renamed >= 5. HIGH_ENTROPY remains calibrated at 7.0 bits/byte Shannon scale."
+}

@@ -1,11 +1,12 @@
 """
 RansomGuard - Main Control Launcher (main.py)
 
-Command-line entry point for RansomGuard Stage 1, Stage 2 & Stage 3 prototype.
+Command-line entry point for RansomGuard Stage 1, Stage 2, Stage 3 & Stage 4 live detection prototype.
 Supports:
 - Stage 1: Sandbox reset, raw event watcher, normal & attack simulators
 - Stage 2: Live 5s sliding-window behavioral feature extraction
 - Stage 3: Benign high-activity simulator, automated dataset generation, run-based splitting, and validation
+- Stage 4: Random Forest model training, verification, FastAPI server, live telemetry bridge, pipeline reset
 """
 
 import sys
@@ -99,6 +100,7 @@ Examples:
   python main.py split-data --seed 42
   python main.py validate-data
   python main.py verify-stage3
+  python main.py reset-pipeline
 """,
     )
 
@@ -139,6 +141,13 @@ Examples:
     attack_parser.add_argument("--speed", choices=["slow", "medium", "fast"], default="medium", help="Burst speed (default: medium)")
     attack_parser.add_argument("--max-files", type=int, default=20, help="Max files to affect (default: 20)")
     attack_parser.add_argument("--seed", type=int, default=None, help="Random seed for reproducibility")
+    attack_parser.add_argument("--auto-contain", action="store_true", help="Enable safe simulated containment during attack simulation")
+
+    # Command: demo-containment
+    contain_demo_parser = subparsers.add_parser("demo-containment", help="Run safe simulated containment demonstration against controlled attack simulator")
+    contain_demo_parser.add_argument("--speed", choices=["slow", "medium", "fast"], default="medium", help="Burst speed (default: medium)")
+    contain_demo_parser.add_argument("--max-files", type=int, default=20, help="Max files to affect (default: 20)")
+    contain_demo_parser.add_argument("--seed", type=int, default=42, help="Random seed (default: 42)")
 
     # Command: generate-data
     gen_parser = subparsers.add_parser("generate-data", help="Automate dataset generation for normal, benign, and attack runs")
@@ -165,6 +174,9 @@ Examples:
 
     # Command: verify-model
     subparsers.add_parser("verify-model", help="Verify trained model metrics against untouched test set")
+
+    # Command: reset-pipeline
+    subparsers.add_parser("reset-pipeline", aliases=["clear-pipeline"], help="Reset live telemetry bridge window and FastAPI backend debounce state")
 
     # Command: serve
     serve_parser = subparsers.add_parser(
@@ -202,7 +214,14 @@ Examples:
     elif args.command == "benign":
         run_benign_simulation(duration=args.duration, delay=args.delay, speed=args.speed, max_files=args.max_files, seed=args.seed)
     elif args.command == "attack":
-        run_attack_simulation(speed=args.speed, max_files=args.max_files, seed=args.seed)
+        if getattr(args, "auto_contain", False):
+            from containment.run_containment_demo import run_safe_containment_demo
+            run_safe_containment_demo(speed=args.speed, max_files=args.max_files, seed=args.seed, auto_contain=True)
+        else:
+            run_attack_simulation(speed=args.speed, max_files=args.max_files, seed=args.seed)
+    elif args.command == "demo-containment":
+        from containment.run_containment_demo import run_safe_containment_demo
+        run_safe_containment_demo(speed=args.speed, max_files=args.max_files, seed=args.seed, auto_contain=True)
     elif args.command == "generate-data":
         target_cls = "all" if args.all else args.target_class
         runs_cnt = args.runs if (target_cls != "all" and not args.all) else args.runs_per_class
@@ -219,6 +238,16 @@ Examples:
     elif args.command == "verify-model":
         import subprocess
         subprocess.run([sys.executable, str(PROJECT_ROOT / "training" / "verify_model.py")])
+    elif args.command in ["reset-pipeline", "clear-pipeline"]:
+        import requests
+        try:
+            res = requests.post("http://127.0.0.1:8000/reset-pipeline", timeout=2.0)
+            if res.status_code == 200:
+                print("[SUCCESS] Backend live pipeline and debounce state reset.")
+            else:
+                print(f"[WARNING] Reset endpoint returned status {res.status_code}: {res.text}")
+        except Exception as err:
+            print(f"[INFO] Backend unavailable or reset request failed: {err}")
     elif args.command in ["serve", "server"]:
         try:
             import uvicorn
@@ -241,4 +270,3 @@ Examples:
 
 if __name__ == "__main__":
     main()
-

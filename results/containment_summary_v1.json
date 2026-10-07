@@ -1,0 +1,340 @@
+{
+  "timestamp": "2026-10-07 20:47:51",
+  "total_attack_runs": 9,
+  "containment_success_rate": 1.0,
+  "safety_tests": {
+    "normal_workload": {
+      "workload": "normal",
+      "containment_triggered": false,
+      "pass": true
+    },
+    "benign_workload": {
+      "workload": "benign",
+      "containment_triggered": false,
+      "pass": true
+    }
+  },
+  "failure_case_tests": {
+    "case_no_active_simulator": true,
+    "case_idempotent_duplicate_call": true,
+    "all_passed": true
+  },
+  "aggregate_metrics": {
+    "TTD_raw": {
+      "mean": 1.1956,
+      "median": 1.082,
+      "min": 1.0469,
+      "max": 2.1556
+    },
+    "TTD_confirmed": {
+      "mean": 2.2662,
+      "median": 2.1576,
+      "min": 2.1001,
+      "max": 3.2187
+    },
+    "TTC": {
+      "mean": 0.042,
+      "median": 0.0,
+      "min": 0.0,
+      "max": 0.1566
+    },
+    "files_affected_before_raw_detection": {
+      "mean": 11.3333,
+      "median": 11,
+      "min": 3,
+      "max": 19
+    },
+    "files_affected_before_confirmed_alert": {
+      "mean": 14.8889,
+      "median": 19,
+      "min": 6,
+      "max": 19
+    },
+    "files_affected_before_containment": {
+      "mean": 14.8889,
+      "median": 19,
+      "min": 6,
+      "max": 19
+    },
+    "percentage_files_protected": {
+      "mean": 25.5556,
+      "median": 5.0,
+      "min": 5.0,
+      "max": 70.0
+    }
+  },
+  "mode_breakdown": {
+    "slow": {
+      "runs_count": 3,
+      "TTD_raw": {
+        "mean": 1.4311,
+        "median": 1.0909,
+        "min": 1.0469,
+        "max": 2.1556
+      },
+      "TTD_confirmed": {
+        "mean": 2.4975,
+        "median": 2.1737,
+        "min": 2.1001,
+        "max": 3.2187
+      },
+      "TTC": {
+        "mean": 0.1261,
+        "median": 0.1282,
+        "min": 0.0935,
+        "max": 0.1566
+      },
+      "files_before_containment": {
+        "mean": 6.6667,
+        "median": 6,
+        "min": 6,
+        "max": 8
+      },
+      "percentage_protected": {
+        "mean": 66.6667,
+        "median": 70.0,
+        "min": 60.0,
+        "max": 70.0
+      }
+    },
+    "medium": {
+      "runs_count": 3,
+      "TTD_raw": {
+        "mean": 1.0814,
+        "median": 1.0857,
+        "min": 1.0694,
+        "max": 1.0892
+      },
+      "TTD_confirmed": {
+        "mean": 2.1527,
+        "median": 2.1576,
+        "min": 2.1421,
+        "max": 2.1583
+      },
+      "TTC": {
+        "mean": 0.0,
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0
+      },
+      "files_before_containment": {
+        "mean": 19.0,
+        "median": 19,
+        "min": 19,
+        "max": 19
+      },
+      "percentage_protected": {
+        "mean": 5.0,
+        "median": 5.0,
+        "min": 5.0,
+        "max": 5.0
+      }
+    },
+    "fast": {
+      "runs_count": 3,
+      "TTD_raw": {
+        "mean": 1.0743,
+        "median": 1.0754,
+        "min": 1.0654,
+        "max": 1.082
+      },
+      "TTD_confirmed": {
+        "mean": 2.1485,
+        "median": 2.1481,
+        "min": 2.138,
+        "max": 2.1593
+      },
+      "TTC": {
+        "mean": 0.0,
+        "median": 0.0,
+        "min": 0.0,
+        "max": 0.0001
+      },
+      "files_before_containment": {
+        "mean": 19.0,
+        "median": 19,
+        "min": 19,
+        "max": 19
+      },
+      "percentage_protected": {
+        "mean": 5.0,
+        "median": 5.0,
+        "min": 5.0,
+        "max": 5.0
+      }
+    }
+  },
+  "per_run_results": [
+    {
+      "run_id": "attack_contain_slow_seed101",
+      "speed": "slow",
+      "seed": 101,
+      "containment_status": "stopped_successfully",
+      "no_post_containment_ops": true,
+      "metrics": {
+        "TTD_raw": 1.0909,
+        "TTD_confirmed": 2.1737,
+        "TTC": 0.1282,
+        "total_response_time": 2.3018,
+        "files_affected_before_raw_detection": 3,
+        "files_affected_before_confirmed_alert": 6,
+        "files_affected_before_containment": 6,
+        "total_target_files": 20,
+        "files_protected": 14,
+        "percentage_files_protected": 70.0
+      }
+    },
+    {
+      "run_id": "attack_contain_slow_seed102",
+      "speed": "slow",
+      "seed": 102,
+      "containment_status": "stopped_successfully",
+      "no_post_containment_ops": true,
+      "metrics": {
+        "TTD_raw": 2.1556,
+        "TTD_confirmed": 3.2187,
+        "TTC": 0.0935,
+        "total_response_time": 3.3123,
+        "files_affected_before_raw_detection": 6,
+        "files_affected_before_confirmed_alert": 8,
+        "files_affected_before_containment": 8,
+        "total_target_files": 20,
+        "files_protected": 12,
+        "percentage_files_protected": 60.0
+      }
+    },
+    {
+      "run_id": "attack_contain_slow_seed103",
+      "speed": "slow",
+      "seed": 103,
+      "containment_status": "stopped_successfully",
+      "no_post_containment_ops": true,
+      "metrics": {
+        "TTD_raw": 1.0469,
+        "TTD_confirmed": 2.1001,
+        "TTC": 0.1566,
+        "total_response_time": 2.2568,
+        "files_affected_before_raw_detection": 3,
+        "files_affected_before_confirmed_alert": 6,
+        "files_affected_before_containment": 6,
+        "total_target_files": 20,
+        "files_protected": 14,
+        "percentage_files_protected": 70.0
+      }
+    },
+    {
+      "run_id": "attack_contain_medium_seed101",
+      "speed": "medium",
+      "seed": 101,
+      "containment_status": "already_stopped",
+      "no_post_containment_ops": true,
+      "metrics": {
+        "TTD_raw": 1.0694,
+        "TTD_confirmed": 2.1421,
+        "TTC": 0.0,
+        "total_response_time": 2.1422,
+        "files_affected_before_raw_detection": 11,
+        "files_affected_before_confirmed_alert": 19,
+        "files_affected_before_containment": 19,
+        "total_target_files": 20,
+        "files_protected": 1,
+        "percentage_files_protected": 5.0
+      }
+    },
+    {
+      "run_id": "attack_contain_medium_seed102",
+      "speed": "medium",
+      "seed": 102,
+      "containment_status": "already_stopped",
+      "no_post_containment_ops": true,
+      "metrics": {
+        "TTD_raw": 1.0857,
+        "TTD_confirmed": 2.1583,
+        "TTC": 0.0,
+        "total_response_time": 2.1583,
+        "files_affected_before_raw_detection": 11,
+        "files_affected_before_confirmed_alert": 19,
+        "files_affected_before_containment": 19,
+        "total_target_files": 20,
+        "files_protected": 1,
+        "percentage_files_protected": 5.0
+      }
+    },
+    {
+      "run_id": "attack_contain_medium_seed103",
+      "speed": "medium",
+      "seed": 103,
+      "containment_status": "already_stopped",
+      "no_post_containment_ops": true,
+      "metrics": {
+        "TTD_raw": 1.0892,
+        "TTD_confirmed": 2.1576,
+        "TTC": 0.0,
+        "total_response_time": 2.1576,
+        "files_affected_before_raw_detection": 11,
+        "files_affected_before_confirmed_alert": 19,
+        "files_affected_before_containment": 19,
+        "total_target_files": 20,
+        "files_protected": 1,
+        "percentage_files_protected": 5.0
+      }
+    },
+    {
+      "run_id": "attack_contain_fast_seed101",
+      "speed": "fast",
+      "seed": 101,
+      "containment_status": "already_stopped",
+      "no_post_containment_ops": true,
+      "metrics": {
+        "TTD_raw": 1.0754,
+        "TTD_confirmed": 2.138,
+        "TTC": 0.0,
+        "total_response_time": 2.138,
+        "files_affected_before_raw_detection": 19,
+        "files_affected_before_confirmed_alert": 19,
+        "files_affected_before_containment": 19,
+        "total_target_files": 20,
+        "files_protected": 1,
+        "percentage_files_protected": 5.0
+      }
+    },
+    {
+      "run_id": "attack_contain_fast_seed102",
+      "speed": "fast",
+      "seed": 102,
+      "containment_status": "already_stopped",
+      "no_post_containment_ops": true,
+      "metrics": {
+        "TTD_raw": 1.082,
+        "TTD_confirmed": 2.1593,
+        "TTC": 0.0,
+        "total_response_time": 2.1593,
+        "files_affected_before_raw_detection": 19,
+        "files_affected_before_confirmed_alert": 19,
+        "files_affected_before_containment": 19,
+        "total_target_files": 20,
+        "files_protected": 1,
+        "percentage_files_protected": 5.0
+      }
+    },
+    {
+      "run_id": "attack_contain_fast_seed103",
+      "speed": "fast",
+      "seed": 103,
+      "containment_status": "already_stopped",
+      "no_post_containment_ops": true,
+      "metrics": {
+        "TTD_raw": 1.0654,
+        "TTD_confirmed": 2.1481,
+        "TTC": 0.0001,
+        "total_response_time": 2.1482,
+        "files_affected_before_raw_detection": 19,
+        "files_affected_before_confirmed_alert": 19,
+        "files_affected_before_containment": 19,
+        "total_target_files": 20,
+        "files_protected": 1,
+        "percentage_files_protected": 5.0
+      }
+    }
+  ]
+}

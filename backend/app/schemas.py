@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, Field
 
 
@@ -28,3 +29,8 @@ class FeatureWindow(BaseModel):
     )
 
     entropy_change: float
+
+    # Optional metadata fields for live prediction logging and scenario tracking
+    scenario_id: Optional[str] = "live"
+    window_start: Optional[str] = None
+    window_end: Optional[str] = None

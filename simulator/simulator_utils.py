@@ -4,9 +4,11 @@ RansomGuard - Simulator Utilities (simulator/simulator_utils.py)
 Reusable, path-safe helper functions for filesystem simulations.
 Every write, rename, create, and delete operation is strictly validated
 by assert_safe_path() before execution.
+Includes retry mechanism for transient Windows file-lock (WinError 32) race conditions.
 """
 
 import os
+import time
 import random
 from pathlib import Path
 from typing import List, Optional
@@ -43,6 +45,12 @@ def safe_write_text(path: Path, text: str) -> None:
     """
     assert_safe_path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
+    for attempt in range(5):
+        try:
+            path.write_text(text, encoding="utf-8", errors="ignore")
+            return
+        except PermissionError:
+            time.sleep(0.05)
     path.write_text(text, encoding="utf-8", errors="ignore")
 
 
@@ -52,19 +60,30 @@ def safe_write_bytes(path: Path, data: bytes) -> None:
     """
     assert_safe_path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
+    for attempt in range(5):
+        try:
+            path.write_bytes(data)
+            return
+        except PermissionError:
+            time.sleep(0.05)
     path.write_bytes(data)
 
 
 def safe_rename(src_path: Path, new_name_or_rel_path: str) -> Path:
     """
     Safely renames src_path to a new filename or relative destination within demo_folder.
-    Returns the new destination Path.
+    Returns the new destination Path. Retries on transient Windows file lock.
     """
     assert_safe_path(src_path)
-    
     dest_path = src_path.parent / new_name_or_rel_path
     assert_safe_path(dest_path)
-    
+
+    for attempt in range(5):
+        try:
+            src_path.rename(dest_path)
+            return dest_path
+        except PermissionError:
+            time.sleep(0.05)
     src_path.rename(dest_path)
     return dest_path
 
@@ -85,7 +104,14 @@ def safe_delete(path: Path) -> None:
     """
     assert_safe_path(path)
     if path.exists() and path.is_file():
-        path.unlink()
+        for attempt in range(5):
+            try:
+                path.unlink()
+                return
+            except PermissionError:
+                time.sleep(0.05)
+        if path.exists():
+            path.unlink()
 
 
 def generate_random_bytes(size: int = 512, rng: Optional[random.Random] = None) -> bytes:

@@ -1,18 +1,11 @@
 // ============================================================
-// RANSOMGUARD REAL-TIME DASHBOARD
+// RANSOMGUARD REAL-TIME DASHBOARD (frontend/app.js)
 // ============================================================
 
-console.log("[RansomGuard] app.js loaded");
+console.log("[RansomGuard] app.js v1.3 loaded");
 
-// Global error handling for browser console diagnostics
 window.onerror = function (message, source, lineno, colno, error) {
-    console.error("[GLOBAL JS ERROR]", {
-        message: message,
-        source: source,
-        lineno: lineno,
-        colno: colno,
-        error: error
-    });
+    console.error("[GLOBAL JS ERROR]", { message, source, lineno, colno, error });
 };
 
 window.addEventListener("unhandledrejection", function (event) {
@@ -25,7 +18,7 @@ let messageCount = 0;
 
 
 // ============================================================
-// SAFE DOM HELPERS (Prevents generic script errors on missing elements)
+// SAFE DOM HELPERS
 // ============================================================
 
 function getEl(id) {
@@ -49,14 +42,11 @@ function setText(id, value) {
 // ============================================================
 
 function connectWebSocket() {
-
     console.log("[WS] Connecting to RansomGuard WebSocket...");
 
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const host = window.location.host || "127.0.0.1:8000";
     const wsUrl = `${protocol}//${host}/ws`;
-
-    console.log("[WS] Target URL:", wsUrl);
 
     try {
         socket = new WebSocket(wsUrl);
@@ -70,11 +60,11 @@ function connectWebSocket() {
         console.log("[WS] Connected successfully!");
 
         setText("connectionStatus", "SYSTEM ONLINE");
-        setText("eventIndicator", "LIVE");
+        const dot = getEl("statusDot");
+        if (dot) dot.style.background = "#37d67a";
 
-        addLog("WebSocket connected. Live telemetry active.");
+        addLog("SYSTEM", "WebSocket connected. Live telemetry bridge active.");
 
-        // Heartbeat / initiation message
         try {
             socket.send("PING");
         } catch (e) {
@@ -84,24 +74,28 @@ function connectWebSocket() {
 
     socket.onmessage = function (event) {
         messageCount++;
-        console.log(`[WS] Raw message #${messageCount}:`, event.data);
-
         try {
-            const result = JSON.parse(event.data);
-            console.log("[WS] Parsed payload:", result);
-            updateDashboard(result);
+            const data = JSON.parse(event.data);
+            if (data.type === "PIPELINE_RESET") {
+                handlePipelineReset(data);
+            } else if (data.type === "CONTAINMENT_UPDATE") {
+                handleContainmentUpdate(data);
+            } else {
+                updateDashboard(data);
+            }
         } catch (error) {
             console.error("[WS] Error processing message:", error);
         }
     };
 
     socket.onclose = function (event) {
-        console.warn(`[WS] Connection closed (code ${event.code}, reason: ${event.reason || "none"})`);
+        console.warn(`[WS] Connection closed (code ${event.code})`);
 
         setText("connectionStatus", "RECONNECTING...");
-        setText("eventIndicator", "OFFLINE");
+        const dot = getEl("statusDot");
+        if (dot) dot.style.background = "#ff5c5c";
 
-        addLog("WebSocket disconnected. Attempting reconnect...");
+        addLog("SYSTEM", "WebSocket disconnected. Attempting reconnect...");
         scheduleReconnect();
     };
 
@@ -111,19 +105,79 @@ function connectWebSocket() {
 }
 
 
-// ============================================================
-// SAFE RECONNECT LOGIC
-// ============================================================
-
 function scheduleReconnect() {
-    if (reconnectTimer !== null) {
-        return;
-    }
-
+    if (reconnectTimer !== null) return;
     reconnectTimer = setTimeout(function () {
         reconnectTimer = null;
         connectWebSocket();
     }, 2000);
+}
+
+
+// ============================================================
+// HANDLE PIPELINE RESET
+// ============================================================
+
+function handlePipelineReset(data) {
+    setText("threatScore", "0.0");
+    setText("threatStatus", "NO ACTIVE THREAT");
+    setText("severity", "Severity: LOW");
+    
+    const badge = getEl("debounceBadge");
+    if (badge) {
+        badge.textContent = "Confirmed Alert: NO";
+        badge.className = "debounce-badge";
+    }
+
+    const circle = getEl("scoreCircle");
+    if (circle) circle.style.borderColor = "#37d67a";
+
+    setText("prediction", "BENIGN");
+    setText("threatProbability", "0.0%");
+    setText("benignProbability", "100.0%");
+
+    setText("ruleScore", "0");
+    setText("rulesTriggered", "0");
+    setText("ruleCount", "0 RULES");
+
+    setText("eventIndicator", "RESET");
+    setText("alertIcon", "🧹");
+    setText("alertTitle", "Pipeline Reset Executed");
+    setText("alertMessage", data.message || "Sliding window and debounce counters cleared.");
+
+    updateRules([]);
+    updateFeatures({});
+
+    addLog("RESET", data.message || "Pipeline state cleared for new scenario.");
+}
+
+
+// ============================================================
+// HANDLE CONTAINMENT UPDATE
+// ============================================================
+
+function handleContainmentUpdate(data) {
+    const res = data.result || {};
+    const metrics = res.metrics ? res.metrics.metrics : {};
+
+    setText("threatStatus", "SAFE CONTAINMENT EXECUTED 🛡️");
+    setText("eventIndicator", "CONTAINED");
+    setText("alertIcon", "🛡️");
+    setText("alertTitle", "Safe Containment Halted Attack Simulator");
+
+    const ttd = metrics.TTD_confirmed !== undefined ? `${metrics.TTD_confirmed}s` : "N/A";
+    const ttc = metrics.TTC !== undefined ? `${metrics.TTC}s` : "N/A";
+    const protectedPct = metrics.percentage_files_protected !== undefined ? `${metrics.percentage_files_protected}%` : "100%";
+
+    setText("alertMessage", `Controlled attack simulator safely stopped! TTD: ${ttd} | TTC: ${ttc} | Protected: ${protectedPct}`);
+
+    const badge = getEl("debounceBadge");
+    if (badge) {
+        badge.textContent = `Containment: CONTAINED 🛡️ (TTD ${ttd}, TTC ${ttc})`;
+        badge.className = "debounce-badge active-alert";
+    }
+
+    addLog("CONTAINMENT", `Safe simulator containment executed. TTD: ${ttd}, TTC: ${ttc}, Protected: ${protectedPct}`);
 }
 
 
@@ -134,27 +188,67 @@ function scheduleReconnect() {
 function updateDashboard(result) {
     if (!result) return;
 
-    // THREAT SCORE
     const score = Number(result.threat_score) || 0;
     setText("threatScore", score.toFixed(1));
 
-    // SEVERITY
-    const currentSeverity = result.severity || "LOW";
-    setText("severity", `Severity: ${currentSeverity}`);
+    const severity = result.severity || "LOW";
+    setText("severity", `Severity: ${severity}`);
 
-    // PREDICTION
-    const currentPrediction = result.prediction || "UNKNOWN";
-    setText("prediction", currentPrediction);
+    const debounce = result.debounce || {};
+    const isDebouncedAlert = Boolean(debounce.debounced_alert);
+    const debouncedSeverity = debounce.debounced_severity || severity;
 
-    // ML PROBABILITIES
+    // DEBOUNCE BADGE
+    const badge = getEl("debounceBadge");
+    if (badge) {
+        if (isDebouncedAlert) {
+            badge.textContent = `Confirmed Alert: YES 🚨 (${debounce.consecutive_windows || 1}w)`;
+            badge.className = "debounce-badge active-alert";
+        } else if (severity === "HIGH" || severity === "CRITICAL") {
+            badge.textContent = `Confirmed Alert: PENDING (Window 1/${debounce.consecutive_windows || 1})`;
+            badge.className = "debounce-badge pending-alert";
+        } else {
+            badge.textContent = "Confirmed Alert: NO";
+            badge.className = "debounce-badge";
+        }
+    }
+
+    // SCORE CIRCLE COLOR
+    const circle = getEl("scoreCircle");
+    if (circle) {
+        if (debouncedSeverity === "CRITICAL" || debouncedSeverity === "HIGH") {
+            circle.style.borderColor = "#ff4d4d";
+        } else if (severity === "MEDIUM" || debouncedSeverity === "MEDIUM") {
+            circle.style.borderColor = "#ffb84d";
+        } else {
+            circle.style.borderColor = "#37d67a";
+        }
+    }
+
+    // CURRENT THREAT STATUS TEXT
+    if (isDebouncedAlert) {
+        setText("threatStatus", "CONFIRMED THREAT DETECTED");
+    } else if (severity === "HIGH" || severity === "CRITICAL" || result.prediction === "THREAT") {
+        setText("threatStatus", "SUSPICIOUS ACTIVITY (PENDING)");
+    } else {
+        setText("threatStatus", "NO ACTIVE THREAT");
+    }
+
+    // AI DETECTION
+    const prediction = result.prediction || "UNKNOWN";
+    setText("prediction", prediction);
+
     if (result.ml) {
         const threatProb = Number(result.ml.threat_probability) || 0;
         const benignProb = Number(result.ml.benign_probability) || 0;
         setText("threatProbability", `${(threatProb * 100).toFixed(1)}%`);
         setText("benignProbability", `${(benignProb * 100).toFixed(1)}%`);
+        if (result.ml.threshold !== undefined) {
+            setText("rfThreshold", Number(result.ml.threshold).toFixed(2));
+        }
     }
 
-    // RULES
+    // RULE ENGINE
     if (result.rules) {
         const ruleScoreVal = Number(result.rules.rule_score) || 0;
         const rulesTriggeredVal = Number(result.rules.rules_triggered) || 0;
@@ -166,28 +260,32 @@ function updateDashboard(result) {
         updateRules(result.rules.triggered_rules || []);
     }
 
-    // THREAT STATUS & ALERT CARD
-    if (currentPrediction === "THREAT" || currentSeverity === "HIGH" || currentSeverity === "CRITICAL") {
-        setText("threatStatus", "THREAT DETECTED");
+    // CURRENT WINDOW EVENT CARD
+    if (isDebouncedAlert) {
+        setText("eventIndicator", "CONFIRMED THREAT");
         setText("alertIcon", "🚨");
-        setText("alertTitle", "Ransomware-like Activity Detected");
-        setText("alertMessage", "Behavioral indicators have exceeded the detection threshold.");
-        setText("eventIndicator", "THREAT");
+        setText("alertTitle", "Confirmed Ransomware Alert");
+        setText("alertMessage", `Consecutive threat behavior confirmed. Threat Score: ${score.toFixed(1)} | Severity: ${debouncedSeverity}`);
+    } else if (severity === "HIGH" || severity === "CRITICAL" || prediction === "THREAT") {
+        setText("eventIndicator", "SUSPICIOUS");
+        setText("alertIcon", "⚠️");
+        setText("alertTitle", "Suspicious Activity Detected");
+        setText("alertMessage", `Current window score ${score.toFixed(1)} exceeded threshold. Awaiting confirmation.`);
     } else {
-        setText("threatStatus", "NO ACTIVE THREAT");
-        setText("alertIcon", "🟢");
-        setText("alertTitle", "System Monitoring");
-        setText("alertMessage", "Telemetry received. No active ransomware-like behavior detected.");
         setText("eventIndicator", "LIVE");
+        setText("alertIcon", "🟢");
+        setText("alertTitle", "System Monitoring Active");
+        setText("alertMessage", "Telemetry window evaluated cleanly. No active threat detected in current window.");
     }
 
-    // FEATURES
+    // BEHAVIORAL TELEMETRY (11 FEATURES)
     const features = result.features || {};
     updateFeatures(features);
 
-    // EVENT LOG
-    const timestampStr = result.timestamp ? new Date(result.timestamp).toLocaleTimeString() : null;
-    addLog(`${currentPrediction} | Score: ${score.toFixed(1)} | Severity: ${currentSeverity}`, timestampStr);
+    // RECENT DETECTION HISTORY LOG
+    const timestampStr = result.timestamp ? new Date(result.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString();
+    const logMsg = `Score: ${score.toFixed(1)} | Raw: ${severity} | Debounced: ${debouncedSeverity} | Pred: ${prediction} | Rules: ${result.rules?.rules_triggered || 0}`;
+    addLog(debouncedSeverity, logMsg, timestampStr);
 }
 
 
@@ -204,7 +302,7 @@ function updateRules(rules) {
     if (!rules || rules.length === 0) {
         const empty = document.createElement("div");
         empty.className = "empty-state";
-        empty.textContent = "No rules triggered.";
+        empty.textContent = "No rules triggered in current window.";
         rulesList.appendChild(empty);
         return;
     }
@@ -220,6 +318,7 @@ function updateRules(rules) {
         description.textContent = rule.description || "";
 
         const points = document.createElement("span");
+        points.className = "rule-points";
         points.textContent = `+${rule.points ?? 0}`;
 
         ruleElement.appendChild(ruleName);
@@ -232,7 +331,7 @@ function updateRules(rules) {
 
 
 // ============================================================
-// UPDATE FEATURES DISPLAY
+// UPDATE FEATURES DISPLAY (11 CANONICAL FEATURES)
 // ============================================================
 
 function updateFeatures(features) {
@@ -279,10 +378,10 @@ function updateFeatures(features) {
 
 
 // ============================================================
-// EVENT LOG
+// EVENT LOG (PERSISTENT HISTORY)
 // ============================================================
 
-function addLog(message, customTime) {
+function addLog(severityTag, message, customTime) {
     const eventLog = getEl("eventLog");
     if (!eventLog) return;
 
@@ -293,15 +392,21 @@ function addLog(message, customTime) {
     time.className = "log-time";
     time.textContent = customTime || new Date().toLocaleTimeString();
 
-    const messageElement = document.createElement("span");
-    messageElement.textContent = message;
+    const badge = document.createElement("span");
+    badge.className = `log-badge badge-${(severityTag || "low").toLowerCase()}`;
+    badge.textContent = severityTag || "INFO";
+
+    const msgEl = document.createElement("span");
+    msgEl.className = "log-msg";
+    msgEl.textContent = message;
 
     entry.appendChild(time);
-    entry.appendChild(messageElement);
+    entry.appendChild(badge);
+    entry.appendChild(msgEl);
 
     eventLog.prepend(entry);
 
-    while (eventLog.children.length > 30) {
+    while (eventLog.children.length > 50) {
         eventLog.removeChild(eventLog.lastChild);
     }
 }

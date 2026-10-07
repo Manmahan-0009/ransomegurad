@@ -1,0 +1,25 @@
+{
+  "run_id": "contain_demo_medium_1791386064",
+  "timestamp": "2026-10-07T20:44:26.981486",
+  "containment_status": "already_stopped",
+  "state": "CONTAINED",
+  "timestamps": {
+    "attack_start_time": 1791386064.9029393,
+    "raw_detection_time": 1791386065.9504838,
+    "confirmed_alert_time": 1791386066.981213,
+    "containment_request_time": 1791386066.9812162,
+    "containment_complete_time": 1791386066.9812279
+  },
+  "metrics": {
+    "TTD_raw": 1.0475,
+    "TTD_confirmed": 2.0783,
+    "TTC": 0.0,
+    "total_response_time": 2.0783,
+    "files_affected_before_raw_detection": 11,
+    "files_affected_before_confirmed_alert": 19,
+    "files_affected_before_containment": 19,
+    "total_target_files": 20,
+    "files_protected": 1,
+    "percentage_files_protected": 5.0
+  }
+}

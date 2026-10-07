@@ -1,80 +1,49 @@
+"""
+RansomGuard - Model Service (backend/app/model_service.py)
+
+Handles loading the trained RansomGuard model and executing predictions against feature vectors.
+Attaches model metadata and version information to every prediction response.
+"""
+
 import json
 from pathlib import Path
-
+from typing import Dict, Any, Optional
 import joblib
 import pandas as pd
+from .config import config, DetectionConfig
 
 
 class ModelService:
     """
-    Handles loading the trained RansomGuard model
+    Handles loading the trained RansomGuard Random Forest model
     and making predictions.
     """
 
-    def __init__(self):
-        # ----------------------------------------------------
-        # Find the project root
-        # ----------------------------------------------------
-
+    def __init__(self, cfg: Optional[DetectionConfig] = None):
+        self.cfg = cfg or config
         self.project_root = Path(__file__).resolve().parent.parent.parent
 
-        # ----------------------------------------------------
-        # Model files
-        # ----------------------------------------------------
+        self.model_path = self.project_root / "models" / "ransomguard_rf.joblib"
+        self.metadata_path = self.project_root / "models" / "model_metadata.json"
 
-        self.model_path = (
-            self.project_root
-            / "models"
-            / "ransomguard_rf.joblib"
-        )
-
-        self.metadata_path = (
-            self.project_root
-            / "models"
-            / "model_metadata.json"
-        )
-
-        # ----------------------------------------------------
         # Load model
-        # ----------------------------------------------------
-
         self.model = joblib.load(self.model_path)
 
-        # ----------------------------------------------------
         # Load metadata
-        # ----------------------------------------------------
-
-        with open(
-            self.metadata_path,
-            "r",
-            encoding="utf-8"
-        ) as file:
+        with open(self.metadata_path, "r", encoding="utf-8") as file:
             self.metadata = json.load(file)
 
-        # ----------------------------------------------------
         # Extract configuration
-        # ----------------------------------------------------
+        self.feature_columns = self.metadata["feature_columns"]
+        # Use threshold from metadata if present, else fallback to config
+        self.threshold = float(self.metadata.get("selected_threshold", self.cfg.rf_threshold))
+        self.model_version = self.metadata.get("model_version", self.cfg.model_version)
+        self.feature_schema_version = self.metadata.get("feature_schema_version", self.cfg.feature_schema_version)
 
-        self.feature_columns = self.metadata[
-            "feature_columns"
-        ]
-
-        self.threshold = float(
-            self.metadata[
-                "selected_threshold"
-            ]
-        )
-
-    def predict(self, features: dict) -> dict:
+    def predict(self, features: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Run the trained model against one behavioral
-        feature window.
+        Run the trained model against one behavioral feature window.
         """
-
-        # ----------------------------------------------------
-        # Make sure every required feature exists
-        # ----------------------------------------------------
-
         missing_features = [
             feature
             for feature in self.feature_columns
@@ -82,57 +51,33 @@ class ModelService:
         ]
 
         if missing_features:
-            raise ValueError(
-                f"Missing features: {missing_features}"
-            )
+            raise ValueError(f"Missing features: {missing_features}")
 
-        # ----------------------------------------------------
-        # Put features into the exact order expected
-        # by the model
-        # ----------------------------------------------------
-
+        # Put features into the exact order expected by the model
         feature_data = {
             feature: features[feature]
             for feature in self.feature_columns
         }
 
-        dataframe = pd.DataFrame(
-            [feature_data]
-        )
+        dataframe = pd.DataFrame([feature_data])
 
-        # ----------------------------------------------------
         # Get probabilities
-        # ----------------------------------------------------
+        probabilities = self.model.predict_proba(dataframe)[0]
+        benign_probability = float(probabilities[0])
+        threat_probability = float(probabilities[1])
 
-        probabilities = self.model.predict_proba(
-            dataframe
-        )[0]
-
-        benign_probability = float(
-            probabilities[0]
-        )
-
-        threat_probability = float(
-            probabilities[1]
-        )
-
-        # ----------------------------------------------------
         # Apply saved threshold
-        # ----------------------------------------------------
-
         prediction = (
             "THREAT"
             if threat_probability >= self.threshold
             else "BENIGN"
         )
 
-        # ----------------------------------------------------
-        # Return clean result
-        # ----------------------------------------------------
-
         return {
             "prediction": prediction,
             "benign_probability": benign_probability,
             "threat_probability": threat_probability,
             "threshold": self.threshold,
+            "model_version": self.model_version,
+            "feature_schema_version": self.feature_schema_version,
         }

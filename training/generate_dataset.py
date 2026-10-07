@@ -104,7 +104,6 @@ def generate_single_run(
 ) -> Dict[str, Any]:
     """
     Executes a single simulation run and records raw events & metadata.
-    Decouples observation duration from simulator duration.
     """
     cls_lower = cls_name.lower()
     cls_upper = cls_lower.upper()
@@ -112,7 +111,7 @@ def generate_single_run(
     demo_dir = get_demo_dir()
 
     print(f"\n==================================================")
-    print(f" [GENERATE RUN] ID: {run_id} | Class: {cls_upper}")
+    print(f" [GENERATE RUN] ID: {run_id} | Class: {cls_upper} | Speed: {speed}")
     print(f"==================================================")
 
     # 1. Reset sandbox
@@ -133,12 +132,12 @@ def generate_single_run(
     ground_truth_ops = []
 
     try:
-        # Pre-observation baseline monitoring (default: 3.0s)
+        # Pre-observation baseline monitoring
         time.sleep(pre_observation_seconds)
 
         # 3. Execute Simulator
         if cls_lower == "normal":
-            run_normal_simulation(duration=duration, delay=2.0, seed=seed)
+            run_normal_simulation(duration=duration, delay=1.5, seed=seed)
         elif cls_lower == "benign":
             run_benign_simulation(duration=duration, speed=speed, seed=seed)
         elif cls_lower == "attack":
@@ -148,7 +147,7 @@ def generate_single_run(
         else:
             raise ValueError(f"Unknown simulation class: {cls_name}")
     finally:
-        # Post-observation grace period (default: 5.0s)
+        # Post-observation grace period
         time.sleep(post_observation_seconds)
         observer.stop()
         observer.join()
@@ -225,7 +224,6 @@ def replay_and_extract_windows(
     event_idx = 0
 
     while current_time <= end_time + stride_seconds:
-        # Feed events that arrived up to current_time
         while event_idx < len(sorted_events) and sorted_events[event_idx].arrival_time <= current_time:
             evt = sorted_events[event_idx]
             event_idx += 1
@@ -258,7 +256,7 @@ def replay_and_extract_windows(
 
 def append_rows_to_dataset(rows: List[Dict[str, Any]], csv_path: Path) -> None:
     """
-    Appends feature rows to data/datasets/dataset_v1.csv, writing headers if file is new.
+    Appends feature rows to data/datasets/dataset_v1.csv.
     """
     file_exists = csv_path.exists() and csv_path.stat().st_size > 0
 
@@ -271,28 +269,29 @@ def append_rows_to_dataset(rows: List[Dict[str, Any]], csv_path: Path) -> None:
 
 def run_dataset_generation(
     target_class: str = "all",
-    runs_per_class: int = 3,
+    runs_per_class: int = 10,
     duration: float = 15.0,
     seed: Optional[int] = 42,
     fresh: bool = False,
+    start_run_index: int = 1,
 ) -> Path:
     """
     Generates dataset by running simulations, collecting raw events, replaying features, and writing CSV.
+    Varies workload speed/intensity across runs for benign and attack classes.
     """
     dataset_csv = get_datasets_dir() / "dataset_v1.csv"
 
     if fresh:
         clear_previous_dataset_artifacts()
-    elif dataset_csv.exists() and dataset_csv.stat().st_size > 0:
-        print(f"[ERROR] Existing dataset found at: {dataset_csv}")
-        print("Please use --fresh flag to clear previous generated dataset artifacts before regenerating.")
-        raise RuntimeError("Dataset CSV already exists. Use --fresh to clear previous generated dataset artifacts.")
 
     classes_to_run = (
         ["normal", "benign", "attack"]
         if target_class.lower() == "all"
         else [target_class.lower()]
     )
+
+    # Speed variations for benign and attack runs
+    speed_rotation = ["slow", "medium", "fast", "medium", "fast", "slow", "medium", "fast", "slow", "medium"]
 
     class_run_counts = {"normal": 0, "benign": 0, "attack": 0}
     class_row_counts = {"normal": 0, "benign": 0, "attack": 0}
@@ -301,9 +300,13 @@ def run_dataset_generation(
     zero_row_runs: List[str] = []
 
     for cls in classes_to_run:
-        for idx in range(1, runs_per_class + 1):
-            run_seed = (seed + idx) if seed is not None else None
-            speed = "medium" if cls == "attack" else "medium"
+        for idx in range(start_run_index, start_run_index + runs_per_class):
+            run_seed = (seed * 100 + idx) if seed is not None else None
+
+            if cls in ["benign", "attack"]:
+                speed = speed_rotation[(idx - 1) % len(speed_rotation)]
+            else:
+                speed = "medium"
 
             run_data = generate_single_run(
                 cls_name=cls,
@@ -371,8 +374,9 @@ def main():
         help="Class to generate: normal | benign | attack | all (default: all)",
     )
     parser.add_argument("--all", action="store_true", help="Generate runs for all classes")
-    parser.add_argument("--runs", type=int, default=3, help="Number of runs (default: 3)")
-    parser.add_argument("--runs-per-class", type=int, default=3, help="Runs per class if class=all (default: 3)")
+    parser.add_argument("--runs", type=int, default=10, help="Number of runs (default: 10)")
+    parser.add_argument("--runs-per-class", type=int, default=10, help="Runs per class if class=all (default: 10)")
+    parser.add_argument("--start-index", type=int, default=1, help="Starting index for run_id generation (default: 1)")
     parser.add_argument("--duration", type=float, default=15.0, help="Run duration in seconds (default: 15)")
     parser.add_argument("--seed", type=int, default=42, help="Base random seed (default: 42)")
     parser.add_argument("--fresh", action="store_true", help="Clear previous generated dataset artifacts before running")
@@ -384,6 +388,7 @@ def main():
     run_dataset_generation(
         target_class=target_cls,
         runs_per_class=runs_cnt,
+        start_run_index=args.start_index,
         duration=args.duration,
         seed=args.seed,
         fresh=args.fresh,

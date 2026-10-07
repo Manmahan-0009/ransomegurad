@@ -1,0 +1,19 @@
+Category,Metric,Value,Notes
+Dataset,Total Independent Runs,30,10 Normal / 10 Benign / 10 Attack
+Dataset,Total Feature Windows,482,Grouped by run_id across 11 features
+Dataset,Train/Val/Test Splits,18 / 6 / 6 runs,60% train / 20% val / 20% test
+Model,RF Version,rf_v2,n_estimators=200 balanced
+Model,Selected RF Threshold,0.20,Optimized on validation set
+Model,Test Set Accuracy,1.0000,Held-out untouched test split
+Model,Test Set Precision,1.0000,TP=16 FP=0
+Model,Test Set Recall,1.0000,TP=16 FN=0
+Model,Test Set F1 Score,1.0000,Macro average
+Detection,TTD Raw Average,1.0877s,Time to initial raw detection
+Detection,TTD Confirmed Average,2.1567s,Time to 2-window confirmed alert
+Detection,Normal False Alert Rate,0.0%,0 / 10 runs
+Detection,Benign False Alert Rate,0.0%,0 / 10 runs
+Containment,TTC Average,0.0136s,Time to halt simulator thread
+Containment,Containment Success Rate,100.0%,9 / 9 attack runs
+Protection,Slow Attack Protected %,70.0%,14 / 20 files saved
+Protection,Medium Attack Protected %,5.0%,1 / 20 files saved
+Protection,Fast Attack Protected %,5.0%,1 / 20 files saved

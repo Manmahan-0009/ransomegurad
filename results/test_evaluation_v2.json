@@ -1,0 +1,90 @@
+{
+  "config": {
+    "model_version": "rf_v1",
+    "feature_schema_version": "v1",
+    "rf_threshold": 0.2,
+    "ml_weight": 0.7,
+    "rule_weight": 0.3,
+    "critical_thresh": 80.0,
+    "high_thresh": 60.0,
+    "medium_thresh": 30.0,
+    "consecutive_windows_required": 2
+  },
+  "window_level_metrics": {
+    "TP": 16,
+    "TN": 83,
+    "FP": 0,
+    "FN": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "fpr": 0.0
+  },
+  "run_level_metrics": {
+    "normal_runs_total": 2,
+    "normal_false_alerts": 0,
+    "normal_false_alert_rate": 0.0,
+    "benign_runs_total": 2,
+    "benign_false_alerts": 0,
+    "benign_false_alert_rate": 0.0,
+    "attack_runs_total": 2,
+    "attack_runs_detected": 2,
+    "attack_run_recall": 1.0
+  },
+  "per_run_breakdown": [
+    {
+      "run_id": "attack_20261007_195410_001",
+      "class": "attack",
+      "total_windows": 12,
+      "attack_positive_windows": 11,
+      "max_threat_score": 79.0,
+      "raw_threat_detected": true,
+      "debounced_alert_triggered": true
+    },
+    {
+      "run_id": "attack_20261007_195426_002",
+      "class": "attack",
+      "total_windows": 7,
+      "attack_positive_windows": 5,
+      "max_threat_score": 79.0,
+      "raw_threat_detected": true,
+      "debounced_alert_triggered": true
+    },
+    {
+      "run_id": "benign_20261007_195237_007",
+      "class": "benign",
+      "total_windows": 20,
+      "attack_positive_windows": 0,
+      "max_threat_score": 6.0,
+      "raw_threat_detected": false,
+      "debounced_alert_triggered": false
+    },
+    {
+      "run_id": "benign_20261007_195347_010",
+      "class": "benign",
+      "total_windows": 20,
+      "attack_positive_windows": 0,
+      "max_threat_score": 7.05,
+      "raw_threat_detected": false,
+      "debounced_alert_triggered": false
+    },
+    {
+      "run_id": "normal_20261007_194735_004",
+      "class": "normal",
+      "total_windows": 20,
+      "attack_positive_windows": 0,
+      "max_threat_score": 0.0,
+      "raw_threat_detected": false,
+      "debounced_alert_triggered": false
+    },
+    {
+      "run_id": "normal_20261007_194931_009",
+      "class": "normal",
+      "total_windows": 20,
+      "attack_positive_windows": 0,
+      "max_threat_score": 2.1,
+      "raw_threat_detected": false,
+      "debounced_alert_triggered": false
+    }
+  ]
+}

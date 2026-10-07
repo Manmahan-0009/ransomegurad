@@ -58,7 +58,7 @@ with open(METADATA_PATH, "r", encoding="utf-8") as f:
     metadata = json.load(f)
 
 FEATURE_COLUMNS = metadata["feature_columns"]
-THRESHOLD = float(metadata["selected_threshold"])
+THRESHOLD = float(metadata.get("selected_threshold", metadata.get("rf_threshold", 0.20)))
 
 print("Metadata loaded successfully.")
 print(f"Features: {len(FEATURE_COLUMNS)}")
