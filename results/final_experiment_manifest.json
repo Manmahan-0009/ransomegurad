@@ -13,6 +13,9 @@
     "train_runs": 18,
     "validation_runs": 6,
     "test_runs": 6,
+    "train_windows": 290,
+    "validation_windows": 93,
+    "test_windows": 99,
     "split_strategy": "run_id_grouped"
   },
   "hyperparameters": {

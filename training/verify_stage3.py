@@ -73,6 +73,9 @@ def run_stage3_quick_verification() -> bool:
 
     if ds_hash == "FILE_NOT_FOUND" or manifest_hash == "FILE_NOT_FOUND":
         print("\n  [FAIL] Core Stage 3 dataset or manifest files missing.")
+        print("  Please generate dataset and perform split first by running:\n")
+        print("    python main.py generate-data --all --runs-per-class 3 --seed 42 --fresh")
+        print("    python main.py split-data --seed 42\n")
         return False
 
     # 2. Artifact Completeness Check

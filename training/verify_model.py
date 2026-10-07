@@ -31,8 +31,14 @@ print("=" * 60)
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-MODEL_PATH = PROJECT_ROOT / "models" / "ransomguard_rf.joblib"
-METADATA_PATH = PROJECT_ROOT / "models" / "model_metadata.json"
+MODEL_PATH = PROJECT_ROOT / "models" / "ransomguard_rf_v2.joblib"
+if not MODEL_PATH.exists():
+    MODEL_PATH = PROJECT_ROOT / "models" / "ransomguard_rf.joblib"
+
+METADATA_PATH = PROJECT_ROOT / "models" / "model_metadata_v2.json"
+if not METADATA_PATH.exists():
+    METADATA_PATH = PROJECT_ROOT / "models" / "model_metadata.json"
+
 TEST_PATH = PROJECT_ROOT / "data" / "splits" / "test.csv"
 
 
@@ -41,6 +47,14 @@ TEST_PATH = PROJECT_ROOT / "data" / "splits" / "test.csv"
 # ------------------------------------------------------------
 
 print("\n[1] Loading saved model...")
+
+if not MODEL_PATH.exists():
+    print(f"\n[FAIL] Trained Random Forest model file not found at '{MODEL_PATH}'.")
+    print("Please generate data and train the model first by running:\n")
+    print("  python main.py generate-data --all --runs-per-class 3 --seed 42 --fresh")
+    print("  python main.py split-data --seed 42")
+    print("  python main.py train\n")
+    sys.exit(1)
 
 model = joblib.load(MODEL_PATH)
 
@@ -53,6 +67,10 @@ print(f"Model type: {type(model).__name__}")
 # ------------------------------------------------------------
 
 print("\n[2] Loading model metadata...")
+
+if not METADATA_PATH.exists():
+    print(f"\n[FAIL] Model metadata file not found at '{METADATA_PATH}'.")
+    sys.exit(1)
 
 with open(METADATA_PATH, "r", encoding="utf-8") as f:
     metadata = json.load(f)
@@ -70,6 +88,13 @@ print(f"Decision threshold: {THRESHOLD:.2f}")
 # ------------------------------------------------------------
 
 print("\n[3] Loading untouched test set...")
+
+if not TEST_PATH.exists():
+    print(f"\n[FAIL] Test set file not found at '{TEST_PATH}'.")
+    print("Please generate datasets and split data first by running:\n")
+    print("  python main.py generate-data --all --runs-per-class 3 --seed 42 --fresh")
+    print("  python main.py split-data --seed 42\n")
+    sys.exit(1)
 
 test_df = pd.read_csv(TEST_PATH)
 

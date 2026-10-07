@@ -1,0 +1,69 @@
+{
+  "audit_version": "v2.0.1",
+  "timestamp": "2026-10-07T21:45:00",
+  "release_commit": "45af967",
+  "release_tag": "v2.0-hackathon",
+  "dataset_reconciliation": {
+    "total_independent_runs": 30,
+    "total_rows": 482,
+    "train_rows": 290,
+    "validation_rows": 93,
+    "test_rows": 99,
+    "row_count_discrepancy_explanation": "104 was an early draft estimation. Physical count of data/splits/test.csv is exactly 99 rows (83 negative, 16 positive). 100% of physical test split rows reach model evaluation with 0 rows excluded."
+  },
+  "model_evaluation": {
+    "input_test_rows": 99,
+    "excluded_rows": 0,
+    "evaluated_rows": 99,
+    "exclusion_reasons": "None. Zero rows filtered or dropped.",
+    "confusion_matrix": {
+      "TN": 83,
+      "FP": 0,
+      "FN": 0,
+      "TP": 16
+    },
+    "metrics": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "specificity": 1.0,
+      "fpr": 0.0,
+      "roc_auc": 1.0
+    }
+  },
+  "reproducibility_audit": {
+    "fresh_clone_help_pass": true,
+    "fresh_clone_stage3_status": "Requires dataset generation (raw data excluded by .gitignore)",
+    "fresh_clone_model_status": "Requires training step (model binaries excluded by .gitignore)",
+    "required_generation_steps": [
+      "python main.py generate-data --all --runs-per-class 3 --seed 42 --fresh",
+      "python main.py split-data --seed 42",
+      "python main.py verify-stage3",
+      "python main.py train",
+      "python main.py verify-model"
+    ]
+  },
+  "artifact_tracking": {
+    "tracked_in_git": [
+      "Source code (main.py, backend/, simulator/, containment/, monitoring/, windowing/, features/, training/)",
+      "Frontend dashboard (frontend/app.js, index.html, style.css)",
+      "Model metadata (models/model_metadata_v2.json, feature_importance_v2.json)",
+      "Feature schema (features/feature_schema_v1.json)",
+      "Evaluation results & summaries (results/*.json, results/*.csv)",
+      "Presentation charts (results/charts/*.png)",
+      "Documentation (README.md, docs/presenter_script.md)"
+    ],
+    "ignored_by_gitignore": [
+      "venv/",
+      "models/*.joblib",
+      "data/datasets/*",
+      "data/splits/*",
+      "data/raw_events/*",
+      "data/run_metadata/*",
+      "logs/*"
+    ],
+    "fully_reproducible_locally": true
+  },
+  "audit_status": "PASS"
+}

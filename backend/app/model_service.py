@@ -23,8 +23,22 @@ class ModelService:
         self.cfg = cfg or config
         self.project_root = Path(__file__).resolve().parent.parent.parent
 
-        self.model_path = self.project_root / "models" / "ransomguard_rf.joblib"
-        self.metadata_path = self.project_root / "models" / "model_metadata.json"
+        self.model_path = self.project_root / "models" / "ransomguard_rf_v2.joblib"
+        if not self.model_path.exists():
+            self.model_path = self.project_root / "models" / "ransomguard_rf.joblib"
+
+        self.metadata_path = self.project_root / "models" / "model_metadata_v2.json"
+        if not self.metadata_path.exists():
+            self.metadata_path = self.project_root / "models" / "model_metadata.json"
+
+        if not self.model_path.exists():
+            raise FileNotFoundError(
+                f"Trained Random Forest model binary not found at '{self.model_path}'. "
+                "Please generate datasets and train the model first by running:\n"
+                "  python main.py generate-data --all --runs-per-class 3 --seed 42 --fresh\n"
+                "  python main.py split-data --seed 42\n"
+                "  python main.py train"
+            )
 
         # Load model
         self.model = joblib.load(self.model_path)

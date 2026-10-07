@@ -8,9 +8,9 @@
     "attack_runs": 10,
     "total_feature_windows": 482,
     "split_breakdown": {
-      "train_windows": 285,
+      "train_windows": 290,
       "validation_windows": 93,
-      "test_windows": 104
+      "test_windows": 99
     }
   },
   "model": {
