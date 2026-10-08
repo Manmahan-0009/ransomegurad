@@ -1,0 +1,47 @@
+{
+  "platform": "Windows",
+  "central_server_version": "3.1",
+  "agent_version": "3.1",
+  "number_of_agents": 3,
+  "token_authentication": "PASS (401 on invalid token, environment variable required in production)",
+  "canonical_dedup_interval_ms": 200.0,
+  "device_identities": [
+    {
+      "device_id": "rg-73b75ee668d5",
+      "hostname": "TEST-VM-01",
+      "scenario": "NORMAL",
+      "severity": "LOW"
+    },
+    {
+      "device_id": "rg-187723ca7206",
+      "hostname": "TEST-VM-02",
+      "scenario": "BENIGN",
+      "severity": "LOW"
+    },
+    {
+      "device_id": "rg-7cff74e8a3a2",
+      "hostname": "TEST-VM-03",
+      "scenario": "ATTACK",
+      "severity": "HIGH"
+    }
+  ],
+  "registration_status": "PASS",
+  "heartbeat_status": "PASS",
+  "scenario_per_endpoint": {
+    "TEST-VM-01": "NORMAL -> LOW",
+    "TEST-VM-02": "BENIGN -> LOW",
+    "TEST-VM-03": "ATTACK -> HIGH (Confirmed Incident)"
+  },
+  "incident_deduplication": {
+    "attack_episodes": 1,
+    "total_incident_records": 1,
+    "peak_score": 79.0,
+    "window_count": 4,
+    "status": "UPDATED",
+    "result": "PASS (1 continuous attack -> 1 incident episode)"
+  },
+  "alert_isolation_result": "PASS",
+  "offline_online_test_result": "PASS",
+  "db_persistence_test_result": "PASS",
+  "timestamp": "2026-10-07T18:01:22Z"
+}

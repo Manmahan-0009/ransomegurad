@@ -53,6 +53,13 @@ def run_benign_simulation(
     """
     demo_dir = get_demo_dir().resolve()
 
+    import os
+    from process_telemetry.process_resolver import process_resolver
+    process_resolver.register_simulator_process(
+        process_name="python.exe" if os.name == "nt" else "python3",
+    )
+
+
     if not demo_dir.exists():
         print(f"[BENIGN ERROR] Demo folder '{demo_dir}' does not exist! Run reset first.")
         return

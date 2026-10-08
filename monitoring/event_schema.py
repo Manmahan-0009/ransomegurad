@@ -28,6 +28,13 @@ class StructuredEvent:
     file_size: int                        # File size in bytes (0 if unavailable or deleted)
     entropy: Optional[float] = None       # Persisted Shannon entropy reading (if calculated)
     entropy_delta: Optional[float] = None # Persisted entropy delta reading (if calculated)
+    process_id: Optional[int] = None
+    process_name: Optional[str] = None
+    parent_process_id: Optional[int] = None
+    parent_process_name: Optional[str] = None
+    username: Optional[str] = None
+    process_path: Optional[str] = None
+    attribution_confidence: str = "UNKNOWN"
 
     def to_dict(self) -> Dict[str, Any]:
         """Converts structured event instance into a standard dictionary."""
@@ -50,6 +57,13 @@ def create_structured_event(
     event_time: Optional[float] = None,
     entropy: Optional[float] = None,
     entropy_delta: Optional[float] = None,
+    process_id: Optional[int] = None,
+    process_name: Optional[str] = None,
+    parent_process_id: Optional[int] = None,
+    parent_process_name: Optional[str] = None,
+    username: Optional[str] = None,
+    process_path: Optional[str] = None,
+    attribution_confidence: str = "UNKNOWN",
 ) -> StructuredEvent:
     """
     Factory function to construct a StructuredEvent from raw watcher parameters.
@@ -78,4 +92,12 @@ def create_structured_event(
         file_size=file_size,
         entropy=entropy,
         entropy_delta=entropy_delta,
+        process_id=process_id,
+        process_name=process_name,
+        parent_process_id=parent_process_id,
+        parent_process_name=parent_process_name,
+        username=username,
+        process_path=process_path,
+        attribution_confidence=attribution_confidence,
     )
+

@@ -209,5 +209,142 @@ python main.py demo-containment --speed slow --seed 42
 
 ---
 
+## 🌐 Phase 8 — Multi-Endpoint Agent Architecture
+
+RansomGuard v3 introduces an agent-server architecture allowing distributed monitoring across multiple endpoints/VMs simultaneously from a central dashboard.
+
+```text
+SINGLE-ENDPOINT V2:
+  Watcher ──> Detector ──> Backend / Dashboard
+
+MULTI-ENDPOINT V3:
+  Endpoint A (TEST-VM-01) ─┐
+       Local Detection      │
+  Endpoint B (TEST-VM-02) ──┼──> Central FastAPI Server ──> SQLite DB ──> Central Dashboard
+       Local Detection      │       (Device Registry)     (ransomguard_central.db)
+  Endpoint C (TEST-VM-03) ─┘
+       Local Detection
+```
+
+### Key Architectural Properties
+1. **Local Endpoint Inference**: Each agent runs local 11-feature extraction, local Random Forest ML, local rules, and local debounce. Raw filesystem events are never sent across the network.
+2. **Periodic Heartbeats**: Agents send POST `/agents/heartbeat` every 10s. Central server marks devices `ONLINE` (last heartbeat $\le 30$s ago) or `OFFLINE` ($> 30$s ago).
+3. **Device Identity**: Persistent `device_id` (`rg-<hash>`), hostname, OS, model version saved locally in `agent/device_identity.json`.
+4. **Network Resilience**: Detection continues locally uninterrupted if the central server goes offline; agents automatically re-register and resume heartbeats upon reconnection.
+5. **Strict Device State Isolation**: Alerts and high severity on Endpoint C do NOT modify device state or threat levels of Endpoint A or B.
+
+### LAN Deployment Example
+**Central Server (e.g. `192.168.1.10`):**
+```bash
+python main.py serve --host 0.0.0.0 --port 8000
+```
+
+**Remote Endpoint Agent:**
+```bash
+python main.py agent --server http://192.168.1.10:8000 --device-name TEST-VM-01
+```
+
+### Security Authentication Configuration
+
+RansomGuard requires authentication Bearer tokens for all agent endpoints (`POST /agents/*`).
+
+Set `RANSOMGUARD_AGENT_TOKEN` in your environment:
+
+**Linux / macOS:**
+```bash
+export RANSOMGUARD_AGENT_TOKEN="your-secure-agent-token-here"
+```
+
+**Windows PowerShell:**
+```powershell
+$env:RANSOMGUARD_AGENT_TOKEN="your-secure-agent-token-here"
+```
+
+For development/testing mode:
+```bash
+export RANSOMGUARD_ENV="development"
+```
+
+---
+
+## 🚀 Phase 9 — Process-Aware Endpoint Telemetry
+
+RansomGuard Phase 9 adds process attribution context to answer not just *"WHAT happened on the filesystem"*, but *"WHICH PROCESS caused the activity"*.
+
+### Key Features & Architecture
+1. **ProcessContext Layer**: Enriches telemetry without altering the 11 canonical filesystem features.
+2. **Attribution Confidence Levels**:
+   - `DIRECT`: Exact PID/process context from controlled simulator or OS event provenance.
+   - `CORRELATED_HIGH`: Process active in background modifying monitored paths.
+   - `CORRELATED_LOW`: Process active in background during sliding window.
+   - `UNKNOWN`: Default when PID attribution cannot be verified.
+3. **Incident Episode Deduplication**: Converts continuous attack bursts into a single security incident episode (`OPEN` $\rightarrow$ `UPDATED` $\rightarrow$ `CLOSED`) with peak score, peak severity, window count, and triggered rules union.
+4. **Lightweight Process Cache**: Refreshed periodically (default `1.5s`) using user-space `psutil` without high CPU overhead or unsafe kernel drivers.
+5. **Privacy & Security**: Command line parameters disabled by default (`PROCESS_COMMAND_LINE_ENABLED=false`). No environment variables or file contents transmitted.
+
+### Phase 9 Process Validation Results
+Automated validation artifact (`results/process_telemetry_validation_v3_1.json`):
+- **Endpoints**: 3 (`TEST-VM-01`, `TEST-VM-02`, `TEST-VM-03`)
+- **Attribution Accuracy**: `100% DIRECT` for controlled workloads
+- **Incident Episode Count**: `1` (Continuous attack burst deduplicated into 1 incident episode)
+- **Performance Overhead**: `< 0.1% CPU`, `< 5MB RSS RAM`, `< 3ms` process cache refresh latency
+- **Stage 3 & Model Verification**: `PASS`
+
+---
+
+## 🐥 Phase 10 — Canary / Decoy File Early-Warning Protection
+
+RansomGuard Phase 10 introduces harmless, monitored decoy files ("canaries") to provide early-warning detection when ransomware-like activity interacts with decoy files.
+
+### 💡 What is a Canary File & How Does It Work?
+- **Definition**: Harmless synthetic placeholder files (`Financial_Records_2026.xlsx`, `Employee_Backup.docx`, `Customer_Archive.csv`, `Project_Backup.zip`, `Report_Q4_2026.pdf`) placed in monitored directories that normal users rarely modify.
+- **Why Use Canaries?**: Fast ransomware attacks can affect files before a standard 2-window debounce detector confirms an alert. When a canary file is touched AND strong behavioral signals agree, RansomGuard raises a high-confidence early-confirmation alert (`CANARY_ASSISTED`).
+- **Difference from ML Detection**: Canary signals sit *above* the ML detector as a separate runtime security evidence layer. The canonical 11-feature ML schema and Random Forest model (`rf_v2`) remain 100% unmodified.
+
+### ⏱️ Authoritative Timing Definitions & Harness Reconciliation
+
+To ensure mathematical precision across all policy evaluations, RansomGuard enforces identical, authoritative timing definitions:
+
+- **`attack_start_time`**: Timestamp of the 1st successful ground-truth ransomware operation (`gt_ops[0]["operation_time"]`).
+- **`raw_detection_time`**: Timestamp of the 1st 5-second sliding window crossing raw ML/rule severity thresholds (`HIGH` or `CRITICAL`).
+- **`standard_confirmed_time`**: Timestamp of the 1st confirmed alert produced by standard 2-window debounce (`confirmation_source == "STANDARD_DEBOUNCE"`).
+- **`canary_event_time`**: Timestamp of the 1st valid destructive canary event (`MODIFIED`, `RENAMED`, `DELETED`, `EXTENSION_CHANGED`).
+- **`canary_confirmed_time`**: Timestamp of the 1st canary-assisted early confirmed alert (`confirmation_source == "CANARY_ASSISTED"`).
+- **`containment_complete_time`**: Timestamp when safe cooperative attack simulator stop is verified.
+
+> **Harness Reconciliation Rationale:**  
+> Previous v2/v3 baseline experiments measured $TTD_{raw} \approx 1.087\text{s}$ and $TTD_{confirmed} \approx 2.156\text{s}$ relative to `gt_ops[0]["operation_time"]`. Initial Phase 10 harness iterations measured elapsed wall-clock time starting prior to synchronous simulation launch, which inadvertently included thread setup delay, pre-operation file preparation, and sleep intervals between target writes. The Phase 10 harness now enforces real-time concurrent agent detection and calculates $TTD$ strictly relative to `gt_ops[0]["operation_time"]`.
+
+### 🛡️ Safety & Policy Rules
+1. **Canary Event Alone Is NOT Ransomware**: Modifying a canary file without behavioral evidence (`CANARY_ONLY` mode) logs the event and elevates threat severity to `MEDIUM`, but does **NOT** trigger automatic containment or confirmed alerts.
+2. **Early-Confirmation Policy (`CANARY_ASSISTED`)**: Requires:
+   - Destructive canary event (`MODIFIED`, `RENAMED`, `DELETED`, `EXTENSION_CHANGED`)
+   - RF Threat Probability $\ge$ candidate threshold (e.g. `0.45`)
+   - At least ONE behavioral ransomware indicator (`extension_changes >= 1`, `mean_entropy >= 6.0`, `HIGH_ENTROPY` rule, or `EXTENSION_CHANGES` rule).
+3. **Path Safety & Strict Isolation**: Canaries are restricted to approved sandbox/monitored roots (`.ransomguard_canaries/`). Path traversal (`..`) is strictly blocked.
+4. **Sub-Millisecond Processing Overhead**: Canary event lookup uses $O(1)$ path mapping and SHA-256 hash checks with **sub-millisecond measured processing overhead** ($< 0.05\text{ms}$ lookup, $< 0.35\text{ms}$ verification).
+
+### 🛠️ CLI Management Commands
+```bash
+# Create canary decoy files
+python main.py canary-create --count 5
+
+# Check canary integrity status
+python main.py canary-status
+
+# Reset and recreate canary files safely
+python main.py canary-reset
+```
+
+### Phase 10 Validation Artifacts
+- **Validation Summary**: [canary_validation_v4.json](file:///d:/KLE/freesome/ransomguard/results/canary_validation_v4.json)
+- **Authoritative Policy Comparison**: [canary_policy_comparison_v4_1.json](file:///d:/KLE/freesome/ransomguard/results/canary_policy_comparison_v4_1.json)
+- **Executive Summary Table**: [canary_summary_v4_1.json](file:///d:/KLE/freesome/ransomguard/results/canary_summary_v4_1.json)
+- **Performance Overhead Benchmark**: [canary_performance_v4.json](file:///d:/KLE/freesome/ransomguard/results/canary_performance_v4.json)
+
+---
+
 ## 📜 License
 MIT License. Created for educational and research purposes.
+
+

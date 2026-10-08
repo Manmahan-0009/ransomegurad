@@ -1,0 +1,52 @@
+{
+  "platform": "Windows",
+  "number_of_endpoints": 3,
+  "normal_process": {
+    "process_name": "python.exe",
+    "pid": 29596,
+    "attribution_confidence": "DIRECT"
+  },
+  "benign_process": {
+    "process_name": "python.exe",
+    "pid": 29596,
+    "attribution_confidence": "DIRECT"
+  },
+  "attack_process": {
+    "process_name": "python.exe",
+    "pid": 29596,
+    "parent_process_name": "powershell.exe",
+    "attribution_confidence": "DIRECT"
+  },
+  "controlled_direct_attribution_rate": 1.0,
+  "generic_external_test_result": {
+    "operation": "external_file_write",
+    "attributed_process_name": "unknown",
+    "attributed_pid": null,
+    "attribution_confidence": "UNKNOWN"
+  },
+  "unknown_rate": 0.0,
+  "incorrect_rate": 0.0,
+  "incident_episode_1": {
+    "alert_id": "alert-rg-7cff74e8a3a2-1791473137",
+    "opened_at": 1791473137.839294,
+    "closed_at": 1791473141.4998486,
+    "peak_score": 85.0,
+    "window_count": 3,
+    "final_status": "CLOSED"
+  },
+  "incident_episode_2": {
+    "alert_id": "alert-rg-7cff74e8a3a2-1791473145",
+    "opened_at": 1791473145.7829654,
+    "closed_at": 1791473148.4103322,
+    "peak_score": 79.0,
+    "window_count": 1,
+    "final_status": "CLOSED"
+  },
+  "incident_deduplication_result": "PASS (Exactly 1 incident record per attack episode; closes after 3 LOW windows)",
+  "auth_result": "PASS (Missing token fails in production, invalid token -> 401)",
+  "dedup_interval_ms": 200.0,
+  "performance_artifact": "results/process_telemetry_performance_v3.json",
+  "stage3_result": "PASS",
+  "model_result": "PASS",
+  "timestamp": "2026-10-08T15:25:53Z"
+}

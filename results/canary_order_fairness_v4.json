@@ -1,0 +1,18 @@
+{
+  "number_of_trials": 1000,
+  "candidate_count": 24,
+  "real_files_count": 19,
+  "canary_count": 5,
+  "mean_first_canary_index": 3.34,
+  "median_first_canary_index": 2,
+  "min_first_canary_index": 0,
+  "max_first_canary_index": 18,
+  "distribution_buckets": {
+    "0-4": 708,
+    "5-9": 239,
+    "10-14": 47,
+    "15-19": 6,
+    "no_canary_in_top20": 0
+  },
+  "fairness_conclusion": "PASS: Target ordering is unbiased. Canary files participate in single uniform random shuffle."
+}

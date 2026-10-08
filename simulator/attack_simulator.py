@@ -55,6 +55,13 @@ def run_attack_simulation(
     """
     demo_dir = get_demo_dir()
 
+    import os
+    from process_telemetry.process_resolver import process_resolver
+    process_resolver.register_simulator_process(
+        process_name="python.exe" if os.name == "nt" else "python3",
+    )
+
+
     if not demo_dir.exists():
         print(f"[ATTACK-LIKE ERROR] Demo folder '{demo_dir}' does not exist! Please run reset first.")
         return {"attack_start_time": None, "ground_truth_ops": [], "contained": False}

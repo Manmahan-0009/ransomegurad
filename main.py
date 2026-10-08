@@ -10,6 +10,7 @@ Supports:
 """
 
 import sys
+import os
 import time
 import argparse
 from datetime import datetime
@@ -197,6 +198,32 @@ Examples:
     detect_parser.add_argument("--window", type=float, default=5.0, help="Window size in seconds (default: 5.0)")
     detect_parser.add_argument("--stride", type=float, default=1.0, help="Stride step in seconds (default: 1.0)")
 
+    # Command: agent
+    agent_parser = subparsers.add_parser(
+        "agent",
+        help="Run independent RansomGuard Endpoint Agent"
+    )
+    agent_parser.add_argument("--server", default=os.getenv("RANSOMGUARD_SERVER_URL", "http://127.0.0.1:8000"), help="Central server URL (default: RANSOMGUARD_SERVER_URL or http://127.0.0.1:8000)")
+    agent_parser.add_argument("--device-name", default=None, help="Custom device hostname (default: system node name)")
+    agent_parser.add_argument("--watch-dir", default=None, help="Directory path to monitor (default: sandbox target)")
+
+    # Command: demo-reset
+    demo_reset_parser = subparsers.add_parser(
+        "demo-reset",
+        help="Reset production/demo database (clear all runtime devices, incidents, telemetry, and logs)"
+    )
+    demo_reset_parser.add_argument("--yes", "-y", action="store_true", help="Skip confirmation prompt")
+
+    # Canary commands (Phase 10)
+    canary_create_parser = subparsers.add_parser("canary-create", help="Create canary decoy files in sandbox target")
+    canary_create_parser.add_argument("--device-id", default="rg-cli-device", help="Device ID for canary registration")
+    canary_create_parser.add_argument("--count", type=int, default=5, help="Number of canary files to create (default: 5)")
+
+    subparsers.add_parser("canary-status", help="List active registered canary files and integrity status")
+
+    canary_reset_parser = subparsers.add_parser("canary-reset", help="Reset and recreate canary decoy files safely")
+    canary_reset_parser.add_argument("--device-id", default="rg-cli-device", help="Device ID for canary registration")
+
     args = parser.parse_args()
 
     if args.command == "reset":
@@ -264,6 +291,41 @@ Examples:
     elif args.command in ["live-detect", "detect", "bridge"]:
         from detection.live_telemetry_bridge import start_live_telemetry_bridge
         start_live_telemetry_bridge(api_url=args.api_url, window_seconds=args.window, stride_seconds=args.stride)
+    elif args.command == "agent":
+        from agent.agent_service import run_agent
+        run_agent(server_url=args.server, device_name=args.device_name, watch_dir=args.watch_dir)
+    elif args.command == "canary-create":
+        from canary.canary_manager import canary_manager
+        recs = canary_manager.setup_canaries(device_id=args.device_id, count=args.count)
+        print(f"[CLI] Created {len(recs)} canary files.")
+    elif args.command == "canary-status":
+        from canary.canary_registry import canary_registry
+        from canary.canary_manager import canary_manager
+        canaries = canary_registry.list_canaries()
+        print("==================================================")
+        print(f"         RANSOMGUARD CANARY STATUS ({len(canaries)} registered)")
+        print("==================================================")
+        for c in canaries:
+            st = canary_manager.verify_canary(c)
+            print(f" ID: {c.canary_id} | Path: {c.filename} | Intact: {st['intact']} ({st['reason']})")
+    elif args.command == "demo-reset":
+        if not getattr(args, "yes", False):
+            ans = input("Are you sure you want to clear all devices, incidents, and logs from central demo database? [y/N]: ").strip().lower()
+            if ans not in ("y", "yes"):
+                print("[CANCELLED] Demo database reset operation cancelled.")
+                sys.exit(0)
+        from backend.app.db import CentralDatabase
+        counts = CentralDatabase.reset_demo_database()
+        print("==================================================")
+        print("     RANSOMGUARD DEMO DATABASE RESET SUCCESS      ")
+        print("==================================================")
+        for tbl, cnt in counts.items():
+            print(f"  Deleted {cnt:<5} rows from '{tbl}' table.")
+        print("[SUCCESS] Production/demo database cleared. Datasets and model files intact.")
+    elif args.command == "canary-reset":
+        from canary.canary_manager import canary_manager
+        recs = canary_manager.reset_canaries(device_id=args.device_id)
+        print(f"[CLI] Reset and created {len(recs)} canary files.")
     else:
         parser.print_help()
 

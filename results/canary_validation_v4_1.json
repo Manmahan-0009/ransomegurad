@@ -1,0 +1,140 @@
+{
+  "platform": "Windows",
+  "phase": "Phase 10 - Canary / Decoy File Early-Warning Protection",
+  "git_commit": "e68a3ff88d5744ac66db38fecf8a77f4500e86d9",
+  "git_branch": "main",
+  "verified_at": "2026-10-08T15:27:27Z",
+  "authoritative_timing_semantics_enforced": true,
+  "evidence_freshness_verified": true,
+  "harness_discrepancy_reconciled": true,
+  "canonical_11_feature_model_unmodified": true,
+  "canary_count_per_endpoint": 5,
+  "overhead_classification": "Low measured canary-processing overhead. Path matching is sub-millisecond in this test run, while hash verification and database persistence may exceed 1 ms.",
+  "manual_canary_only_test": {
+    "result": "PASS",
+    "policy_mode": "CANARY_ONLY",
+    "confirmed_alert": false,
+    "containment_executed": false
+  },
+  "normal_workload_test": "PASS (0 false alerts)",
+  "benign_workload_test": "PASS (0 false alerts)",
+  "performance_overhead": {
+    "overhead_classification": "Low measured canary-processing overhead. Path matching is sub-millisecond in this test run, while hash verification and database persistence may exceed 1 ms.",
+    "canary_disabled": {
+      "avg_cpu_pct": 0.0,
+      "peak_cpu_pct": 0.0,
+      "rss_mb": 182.27
+    },
+    "canary_enabled": {
+      "avg_cpu_pct": 1.55,
+      "peak_cpu_pct": 31.0,
+      "rss_mb": 182.71,
+      "matching_latency_ms_mean": 0.3953,
+      "matching_latency_ms_p95": 0.7663,
+      "hash_verification_ms_mean": 0.5797,
+      "hash_verification_ms_p95": 0.6472,
+      "db_event_write_ms_mean": 1.4589,
+      "db_event_write_ms_p95": 2.8381
+    }
+  },
+  "summary_by_speed": {
+    "slow": {
+      "baseline": {
+        "mean_TTD_raw_sec": 5.307,
+        "mean_TTD_confirmed_sec": 5.307,
+        "confirmed_rate": "3/3",
+        "mean_real_files_affected": 11.0,
+        "mean_protected_pct": 42.1,
+        "false_confirmed_alerts": 0
+      },
+      "canary_assisted": {
+        "mean_TTD_raw_sec": 3.326,
+        "mean_TTD_canary_confirmed_sec": 3.326,
+        "confirmed_rate": "3/3",
+        "mean_real_files_affected": 8.0,
+        "mean_protected_pct": 57.9,
+        "false_confirmed_alerts": 0
+      },
+      "delta": {
+        "time_saved_sec": 1.982,
+        "files_saved": 3.0,
+        "percentage_point_improvement": 15.8
+      }
+    },
+    "medium": {
+      "baseline": {
+        "mean_TTD_raw_sec": null,
+        "mean_TTD_confirmed_sec": null,
+        "confirmed_rate": "0/3",
+        "mean_real_files_affected": 16.0,
+        "mean_protected_pct": 15.8,
+        "false_confirmed_alerts": 0
+      },
+      "canary_assisted": {
+        "mean_TTD_raw_sec": 1.124,
+        "mean_TTD_canary_confirmed_sec": 1.124,
+        "confirmed_rate": "3/3",
+        "mean_real_files_affected": 8.0,
+        "mean_protected_pct": 57.9,
+        "false_confirmed_alerts": 0
+      },
+      "delta": {
+        "time_saved_sec": null,
+        "files_saved": 8.0,
+        "percentage_point_improvement": 42.1
+      }
+    },
+    "fast": {
+      "baseline": {
+        "mean_TTD_raw_sec": null,
+        "mean_TTD_confirmed_sec": null,
+        "confirmed_rate": "0/3",
+        "mean_real_files_affected": 16.0,
+        "mean_protected_pct": 15.8,
+        "false_confirmed_alerts": 0
+      },
+      "canary_assisted": {
+        "mean_TTD_raw_sec": 0.589,
+        "mean_TTD_canary_confirmed_sec": 0.589,
+        "confirmed_rate": "3/3",
+        "mean_real_files_affected": 15.0,
+        "mean_protected_pct": 21.1,
+        "false_confirmed_alerts": 0
+      },
+      "delta": {
+        "time_saved_sec": null,
+        "files_saved": 1.0,
+        "percentage_point_improvement": 5.3
+      }
+    }
+  },
+  "density_experiment": [
+    {
+      "canary_count": 1,
+      "time_to_canary_hit": 0.0442,
+      "TTD_canary": 0.4078,
+      "real_files_affected_before_containment": 4,
+      "files_protected": 15,
+      "protection_percentage": 78.95
+    },
+    {
+      "canary_count": 3,
+      "time_to_canary_hit": 0.0523,
+      "TTD_canary": 0.7688,
+      "real_files_affected_before_containment": 8,
+      "files_protected": 11,
+      "protection_percentage": 57.89
+    },
+    {
+      "canary_count": 5,
+      "time_to_canary_hit": 0.0468,
+      "TTD_canary": 1.2498,
+      "real_files_affected_before_containment": 9,
+      "files_protected": 10,
+      "protection_percentage": 52.63
+    }
+  ],
+  "stage3_result": "PASS",
+  "model_result": "PASS",
+  "timestamp": "2026-10-08T15:27:27Z"
+}

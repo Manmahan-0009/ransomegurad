@@ -33,6 +33,13 @@ def run_normal_simulation(duration: float = 15.0, delay: float = 2.0, seed: int 
     """
     demo_dir = get_demo_dir()
 
+    import os
+    from process_telemetry.process_resolver import process_resolver
+    process_resolver.register_simulator_process(
+        process_name="python.exe" if os.name == "nt" else "python3",
+    )
+
+
     if not demo_dir.exists():
         print(f"[NORMAL ERROR] Demo folder '{demo_dir}' does not exist! Please run reset first.")
         return

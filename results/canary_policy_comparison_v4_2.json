@@ -1,0 +1,1133 @@
+{
+  "authoritative_timing_definitions": {
+    "attack_start_time": "Timestamp of 1st ground-truth file operation (gt_ops[0]['operation_time'])",
+    "raw_detection_time": "First sliding window where raw severity is HIGH/CRITICAL",
+    "standard_confirmed_time": "First confirmed alert produced by normal 2-window debounce",
+    "canary_event_time": "First valid destructive canary event (MODIFIED, RENAMED, DELETED, EXTENSION_CHANGED)",
+    "canary_confirmed_time": "First canary-assisted early confirmed alert",
+    "containment_complete_time": "Timestamp when safe attack simulator stop completes"
+  },
+  "evidence_freshness_audit": {
+    "fresh_rf_evidence": true,
+    "rf_signal_age_ms": 0.0,
+    "explanation": "RF probability is evaluated synchronously inside step_detection() on features extracted from the current window buffer ending at the current timestamp."
+  },
+  "harness_reconciliation": {
+    "old_v2_v3_harness": "Measured TTD from 1st ground-truth operation. TTD_raw ~1.087s, TTD_confirmed ~2.156s.",
+    "initial_phase10_discrepancy_cause": "Measured wall-clock time from t_start prior to synchronous run_attack_simulation() execution, including setup and total sleep delay between target file operations, plus post-hoc step_detection().",
+    "standardized_phase10_harness": "Recalculated using exact ground-truth 1st op timestamp (gt_ops[0]['operation_time']) and concurrent real-time agent monitoring."
+  },
+  "baseline_runs": [
+    {
+      "policy": "BASELINE_DEBOUNCE",
+      "confirmation_source": "STANDARD_DEBOUNCE",
+      "fresh_rf_evidence": true,
+      "rf_signal_age_ms": 0.0,
+      "speed": "slow",
+      "seed": 101,
+      "first_canary_index": 24,
+      "candidate_pool": {
+        "real_target_files": 19,
+        "canary_files": 5,
+        "total_candidate_paths": 24
+      },
+      "timestamps": {
+        "attack_start": 1791461743.9592052,
+        "raw_detection_time": 1791461749.3366039,
+        "standard_confirmed_time": 1791461749.3366039,
+        "canary_event_time": null,
+        "canary_confirmed_time": null,
+        "containment_request_time": 1791461749.3366196,
+        "containment_complete_time": 1791461749.5118132
+      },
+      "latencies": {
+        "TTD_raw": 5.3774,
+        "TTD_standard": 5.3774,
+        "TTD_canary": null,
+        "TTC": 0.1752,
+        "total_response_time": 5.5526,
+        "time_saved_vs_standard": null,
+        "time_to_first_canary": null
+      },
+      "file_impact": {
+        "real_files_total": 19,
+        "canary_files_total": 5,
+        "real_files_affected_before_containment": 13,
+        "canary_files_affected_before_containment": 1,
+        "files_protected": 6,
+        "protection_percentage": 31.58
+      },
+      "decision_details": {
+        "canary_event_type": null,
+        "rf_probability": 0.0,
+        "rule_score": 0,
+        "extension_change_count": 0,
+        "mean_entropy": 0.0,
+        "triggered_rules": [],
+        "confirmation_reason": "STANDARD_2_WINDOW_DEBOUNCE",
+        "confirmation_source": "STANDARD_DEBOUNCE"
+      },
+      "false_alert": false,
+      "alert_id": "alert-rg-36b2422f9a9c-1791461749",
+      "final_status": "OPEN"
+    },
+    {
+      "policy": "BASELINE_DEBOUNCE",
+      "confirmation_source": "STANDARD_DEBOUNCE",
+      "fresh_rf_evidence": true,
+      "rf_signal_age_ms": 0.0,
+      "speed": "slow",
+      "seed": 102,
+      "first_canary_index": 12,
+      "candidate_pool": {
+        "real_target_files": 19,
+        "canary_files": 5,
+        "total_candidate_paths": 24
+      },
+      "timestamps": {
+        "attack_start": 1791461750.7859433,
+        "raw_detection_time": 1791461756.2012768,
+        "standard_confirmed_time": 1791461756.2012768,
+        "canary_event_time": null,
+        "canary_confirmed_time": null,
+        "containment_request_time": 1791461756.201291,
+        "containment_complete_time": 1791461756.2217581
+      },
+      "latencies": {
+        "TTD_raw": 5.4153,
+        "TTD_standard": 5.4153,
+        "TTD_canary": null,
+        "TTC": 0.0205,
+        "total_response_time": 5.4358,
+        "time_saved_vs_standard": null,
+        "time_to_first_canary": null
+      },
+      "file_impact": {
+        "real_files_total": 19,
+        "canary_files_total": 5,
+        "real_files_affected_before_containment": 11,
+        "canary_files_affected_before_containment": 2,
+        "files_protected": 8,
+        "protection_percentage": 42.11
+      },
+      "decision_details": {
+        "canary_event_type": null,
+        "rf_probability": 0.0,
+        "rule_score": 0,
+        "extension_change_count": 0,
+        "mean_entropy": 0.0,
+        "triggered_rules": [],
+        "confirmation_reason": "STANDARD_2_WINDOW_DEBOUNCE",
+        "confirmation_source": "STANDARD_DEBOUNCE"
+      },
+      "false_alert": false,
+      "alert_id": "alert-rg-36b2422f9a9c-1791461756",
+      "final_status": "OPEN"
+    },
+    {
+      "policy": "BASELINE_DEBOUNCE",
+      "confirmation_source": "STANDARD_DEBOUNCE",
+      "fresh_rf_evidence": true,
+      "rf_signal_age_ms": 0.0,
+      "speed": "slow",
+      "seed": 103,
+      "first_canary_index": 10,
+      "candidate_pool": {
+        "real_target_files": 19,
+        "canary_files": 5,
+        "total_candidate_paths": 24
+      },
+      "timestamps": {
+        "attack_start": 1791461757.500496,
+        "raw_detection_time": 1791461762.9951515,
+        "standard_confirmed_time": 1791461762.9951515,
+        "canary_event_time": null,
+        "canary_confirmed_time": null,
+        "containment_request_time": 1791461762.9951715,
+        "containment_complete_time": 1791461763.0769956
+      },
+      "latencies": {
+        "TTD_raw": 5.4947,
+        "TTD_standard": 5.4947,
+        "TTD_canary": null,
+        "TTC": 0.0818,
+        "total_response_time": 5.5765,
+        "time_saved_vs_standard": null,
+        "time_to_first_canary": null
+      },
+      "file_impact": {
+        "real_files_total": 19,
+        "canary_files_total": 5,
+        "real_files_affected_before_containment": 10,
+        "canary_files_affected_before_containment": 4,
+        "files_protected": 9,
+        "protection_percentage": 47.37
+      },
+      "decision_details": {
+        "canary_event_type": null,
+        "rf_probability": 0.0,
+        "rule_score": 0,
+        "extension_change_count": 0,
+        "mean_entropy": 0.0,
+        "triggered_rules": [],
+        "confirmation_reason": "STANDARD_2_WINDOW_DEBOUNCE",
+        "confirmation_source": "STANDARD_DEBOUNCE"
+      },
+      "false_alert": false,
+      "alert_id": "alert-rg-36b2422f9a9c-1791461762",
+      "final_status": "OPEN"
+    },
+    {
+      "policy": "BASELINE_DEBOUNCE",
+      "confirmation_source": "STANDARD_DEBOUNCE",
+      "fresh_rf_evidence": true,
+      "rf_signal_age_ms": 0.0,
+      "speed": "medium",
+      "seed": 201,
+      "first_canary_index": 14,
+      "candidate_pool": {
+        "real_target_files": 19,
+        "canary_files": 5,
+        "total_candidate_paths": 24
+      },
+      "timestamps": {
+        "attack_start": 1791461764.3702185,
+        "raw_detection_time": null,
+        "standard_confirmed_time": null,
+        "canary_event_time": null,
+        "canary_confirmed_time": null,
+        "containment_request_time": null,
+        "containment_complete_time": 1791461766.590465
+      },
+      "latencies": {
+        "TTD_raw": null,
+        "TTD_standard": null,
+        "TTD_canary": null,
+        "TTC": null,
+        "total_response_time": 2.2202,
+        "time_saved_vs_standard": null,
+        "time_to_first_canary": null
+      },
+      "file_impact": {
+        "real_files_total": 19,
+        "canary_files_total": 5,
+        "real_files_affected_before_containment": 15,
+        "canary_files_affected_before_containment": 5,
+        "files_protected": 4,
+        "protection_percentage": 21.05
+      },
+      "decision_details": {
+        "canary_event_type": null,
+        "rf_probability": 0.0,
+        "rule_score": 0,
+        "extension_change_count": 0,
+        "mean_entropy": 0.0,
+        "triggered_rules": [],
+        "confirmation_reason": "NONE",
+        "confirmation_source": "STANDARD_DEBOUNCE"
+      },
+      "false_alert": false,
+      "alert_id": "alert-rg-36b2422f9a9c-1791461762",
+      "final_status": "CLOSED"
+    },
+    {
+      "policy": "BASELINE_DEBOUNCE",
+      "confirmation_source": "STANDARD_DEBOUNCE",
+      "fresh_rf_evidence": true,
+      "rf_signal_age_ms": 0.0,
+      "speed": "medium",
+      "seed": 202,
+      "first_canary_index": 4,
+      "candidate_pool": {
+        "real_target_files": 19,
+        "canary_files": 5,
+        "total_candidate_paths": 24
+      },
+      "timestamps": {
+        "attack_start": 1791461768.4102855,
+        "raw_detection_time": null,
+        "standard_confirmed_time": null,
+        "canary_event_time": null,
+        "canary_confirmed_time": null,
+        "containment_request_time": null,
+        "containment_complete_time": 1791461770.6248705
+      },
+      "latencies": {
+        "TTD_raw": null,
+        "TTD_standard": null,
+        "TTD_canary": null,
+        "TTC": null,
+        "total_response_time": 2.2146,
+        "time_saved_vs_standard": null,
+        "time_to_first_canary": null
+      },
+      "file_impact": {
+        "real_files_total": 19,
+        "canary_files_total": 5,
+        "real_files_affected_before_containment": 16,
+        "canary_files_affected_before_containment": 4,
+        "files_protected": 3,
+        "protection_percentage": 15.79
+      },
+      "decision_details": {
+        "canary_event_type": null,
+        "rf_probability": 0.0,
+        "rule_score": 0,
+        "extension_change_count": 0,
+        "mean_entropy": 0.0,
+        "triggered_rules": [],
+        "confirmation_reason": "NONE",
+        "confirmation_source": "STANDARD_DEBOUNCE"
+      },
+      "false_alert": false,
+      "alert_id": "alert-rg-36b2422f9a9c-1791461762",
+      "final_status": "CLOSED"
+    },
+    {
+      "policy": "BASELINE_DEBOUNCE",
+      "confirmation_source": "STANDARD_DEBOUNCE",
+      "fresh_rf_evidence": true,
+      "rf_signal_age_ms": 0.0,
+      "speed": "medium",
+      "seed": 203,
+      "first_canary_index": 2,
+      "candidate_pool": {
+        "real_target_files": 19,
+        "canary_files": 5,
+        "total_candidate_paths": 24
+      },
+      "timestamps": {
+        "attack_start": 1791461772.4404697,
+        "raw_detection_time": null,
+        "standard_confirmed_time": null,
+        "canary_event_time": null,
+        "canary_confirmed_time": null,
+        "containment_request_time": null,
+        "containment_complete_time": 1791461774.6894736
+      },
+      "latencies": {
+        "TTD_raw": null,
+        "TTD_standard": null,
+        "TTD_canary": null,
+        "TTC": null,
+        "total_response_time": 2.249,
+        "time_saved_vs_standard": null,
+        "time_to_first_canary": null
+      },
+      "file_impact": {
+        "real_files_total": 19,
+        "canary_files_total": 5,
+        "real_files_affected_before_containment": 17,
+        "canary_files_affected_before_containment": 3,
+        "files_protected": 2,
+        "protection_percentage": 10.53
+      },
+      "decision_details": {
+        "canary_event_type": null,
+        "rf_probability": 0.0,
+        "rule_score": 0,
+        "extension_change_count": 0,
+        "mean_entropy": 0.0,
+        "triggered_rules": [],
+        "confirmation_reason": "NONE",
+        "confirmation_source": "STANDARD_DEBOUNCE"
+      },
+      "false_alert": false,
+      "alert_id": "alert-rg-36b2422f9a9c-1791461762",
+      "final_status": "CLOSED"
+    },
+    {
+      "policy": "BASELINE_DEBOUNCE",
+      "confirmation_source": "STANDARD_DEBOUNCE",
+      "fresh_rf_evidence": true,
+      "rf_signal_age_ms": 0.0,
+      "speed": "fast",
+      "seed": 301,
+      "first_canary_index": 6,
+      "candidate_pool": {
+        "real_target_files": 19,
+        "canary_files": 5,
+        "total_candidate_paths": 24
+      },
+      "timestamps": {
+        "attack_start": 1791461776.5331757,
+        "raw_detection_time": null,
+        "standard_confirmed_time": null,
+        "canary_event_time": null,
+        "canary_confirmed_time": null,
+        "containment_request_time": null,
+        "containment_complete_time": 1791461777.2085874
+      },
+      "latencies": {
+        "TTD_raw": null,
+        "TTD_standard": null,
+        "TTD_canary": null,
+        "TTC": null,
+        "total_response_time": 0.6754,
+        "time_saved_vs_standard": null,
+        "time_to_first_canary": null
+      },
+      "file_impact": {
+        "real_files_total": 19,
+        "canary_files_total": 5,
+        "real_files_affected_before_containment": 17,
+        "canary_files_affected_before_containment": 3,
+        "files_protected": 2,
+        "protection_percentage": 10.53
+      },
+      "decision_details": {
+        "canary_event_type": null,
+        "rf_probability": 0.0,
+        "rule_score": 0,
+        "extension_change_count": 0,
+        "mean_entropy": 0.0,
+        "triggered_rules": [],
+        "confirmation_reason": "NONE",
+        "confirmation_source": "STANDARD_DEBOUNCE"
+      },
+      "false_alert": false,
+      "alert_id": "alert-rg-36b2422f9a9c-1791461762",
+      "final_status": "CLOSED"
+    },
+    {
+      "policy": "BASELINE_DEBOUNCE",
+      "confirmation_source": "STANDARD_DEBOUNCE",
+      "fresh_rf_evidence": true,
+      "rf_signal_age_ms": 0.0,
+      "speed": "fast",
+      "seed": 302,
+      "first_canary_index": 22,
+      "candidate_pool": {
+        "real_target_files": 19,
+        "canary_files": 5,
+        "total_candidate_paths": 24
+      },
+      "timestamps": {
+        "attack_start": 1791461778.7729747,
+        "raw_detection_time": null,
+        "standard_confirmed_time": null,
+        "canary_event_time": null,
+        "canary_confirmed_time": null,
+        "containment_request_time": null,
+        "containment_complete_time": 1791461779.4368865
+      },
+      "latencies": {
+        "TTD_raw": null,
+        "TTD_standard": null,
+        "TTD_canary": null,
+        "TTC": null,
+        "total_response_time": 0.6639,
+        "time_saved_vs_standard": null,
+        "time_to_first_canary": null
+      },
+      "file_impact": {
+        "real_files_total": 19,
+        "canary_files_total": 5,
+        "real_files_affected_before_containment": 16,
+        "canary_files_affected_before_containment": 4,
+        "files_protected": 3,
+        "protection_percentage": 15.79
+      },
+      "decision_details": {
+        "canary_event_type": null,
+        "rf_probability": 0.0,
+        "rule_score": 0,
+        "extension_change_count": 0,
+        "mean_entropy": 0.0,
+        "triggered_rules": [],
+        "confirmation_reason": "NONE",
+        "confirmation_source": "STANDARD_DEBOUNCE"
+      },
+      "false_alert": false,
+      "alert_id": "alert-rg-36b2422f9a9c-1791461762",
+      "final_status": "CLOSED"
+    },
+    {
+      "policy": "BASELINE_DEBOUNCE",
+      "confirmation_source": "STANDARD_DEBOUNCE",
+      "fresh_rf_evidence": true,
+      "rf_signal_age_ms": 0.0,
+      "speed": "fast",
+      "seed": 303,
+      "first_canary_index": 0,
+      "candidate_pool": {
+        "real_target_files": 19,
+        "canary_files": 5,
+        "total_candidate_paths": 24
+      },
+      "timestamps": {
+        "attack_start": 1791461781.0797837,
+        "raw_detection_time": null,
+        "standard_confirmed_time": null,
+        "canary_event_time": null,
+        "canary_confirmed_time": null,
+        "containment_request_time": null,
+        "containment_complete_time": 1791461781.7244797
+      },
+      "latencies": {
+        "TTD_raw": null,
+        "TTD_standard": null,
+        "TTD_canary": null,
+        "TTC": null,
+        "total_response_time": 0.6447,
+        "time_saved_vs_standard": null,
+        "time_to_first_canary": null
+      },
+      "file_impact": {
+        "real_files_total": 19,
+        "canary_files_total": 5,
+        "real_files_affected_before_containment": 15,
+        "canary_files_affected_before_containment": 5,
+        "files_protected": 4,
+        "protection_percentage": 21.05
+      },
+      "decision_details": {
+        "canary_event_type": null,
+        "rf_probability": 0.0,
+        "rule_score": 0,
+        "extension_change_count": 0,
+        "mean_entropy": 0.0,
+        "triggered_rules": [],
+        "confirmation_reason": "NONE",
+        "confirmation_source": "STANDARD_DEBOUNCE"
+      },
+      "false_alert": false,
+      "alert_id": "alert-rg-36b2422f9a9c-1791461762",
+      "final_status": "CLOSED"
+    }
+  ],
+  "canary_assisted_runs": [
+    {
+      "policy": "CANARY_ASSISTED",
+      "confirmation_source": "CANARY_ML_ASSISTED",
+      "fresh_rf_evidence": true,
+      "rf_signal_age_ms": 0.0,
+      "speed": "slow",
+      "seed": 101,
+      "first_canary_index": null,
+      "candidate_pool": {
+        "real_target_files": 19,
+        "canary_files": 5,
+        "total_candidate_paths": 24
+      },
+      "timestamps": {
+        "attack_start": 1791461783.3834548,
+        "raw_detection_time": 1791461787.314629,
+        "standard_confirmed_time": null,
+        "canary_event_time": 1791461783.4434898,
+        "canary_confirmed_time": 1791461787.314629,
+        "containment_request_time": 1791461787.314654,
+        "containment_complete_time": 1791461787.4926245
+      },
+      "latencies": {
+        "TTD_raw": 3.9312,
+        "TTD_standard": null,
+        "TTD_canary": 3.9312,
+        "TTC": 0.178,
+        "total_response_time": 4.1092,
+        "time_saved_vs_standard": null,
+        "time_to_first_canary": 0.06
+      },
+      "file_impact": {
+        "real_files_total": 19,
+        "canary_files_total": 5,
+        "real_files_affected_before_containment": 10,
+        "canary_files_affected_before_containment": 0,
+        "files_protected": 9,
+        "protection_percentage": 47.37
+      },
+      "decision_details": {
+        "canary_event_type": "MODIFIED",
+        "rf_probability": 0.665,
+        "rule_score": 10,
+        "extension_change_count": 0,
+        "mean_entropy": 6.0337,
+        "triggered_rules": [
+          {
+            "rule": "EXTENSION_CHANGES",
+            "description": "Multiple file extension changes detected (9 changes)",
+            "points": 10
+          }
+        ],
+        "confirmation_reason": "Canary 'MODIFIED' touched with strong ML + behavioral agreement (RF prob=0.67 >= 0.45, rules=[{'rule': 'EXTENSION_CHANGES', 'description': 'Multiple file extension changes detected (9 changes)', 'points': 10}])",
+        "confirmation_source": "CANARY_ML_ASSISTED"
+      },
+      "false_alert": false,
+      "alert_id": "alert-rg-36b2422f9a9c-1791461787",
+      "final_status": "OPEN"
+    },
+    {
+      "policy": "CANARY_ASSISTED",
+      "confirmation_source": "CANARY_ML_ASSISTED",
+      "fresh_rf_evidence": true,
+      "rf_signal_age_ms": 0.0,
+      "speed": "slow",
+      "seed": 102,
+      "first_canary_index": 12,
+      "candidate_pool": {
+        "real_target_files": 19,
+        "canary_files": 5,
+        "total_candidate_paths": 24
+      },
+      "timestamps": {
+        "attack_start": 1791461788.7063231,
+        "raw_detection_time": 1791461791.512638,
+        "standard_confirmed_time": null,
+        "canary_event_time": 1791461788.7476084,
+        "canary_confirmed_time": 1791461791.512638,
+        "containment_request_time": 1791461791.5126646,
+        "containment_complete_time": 1791461791.5738158
+      },
+      "latencies": {
+        "TTD_raw": 2.8063,
+        "TTD_standard": null,
+        "TTD_canary": 2.8063,
+        "TTC": 0.0612,
+        "total_response_time": 2.8675,
+        "time_saved_vs_standard": null,
+        "time_to_first_canary": 0.0413
+      },
+      "file_impact": {
+        "real_files_total": 19,
+        "canary_files_total": 5,
+        "real_files_affected_before_containment": 6,
+        "canary_files_affected_before_containment": 1,
+        "files_protected": 13,
+        "protection_percentage": 68.42
+      },
+      "decision_details": {
+        "canary_event_type": "MODIFIED",
+        "rf_probability": 0.655,
+        "rule_score": 10,
+        "extension_change_count": 0,
+        "mean_entropy": 5.9588,
+        "triggered_rules": [
+          {
+            "rule": "EXTENSION_CHANGES",
+            "description": "Multiple file extension changes detected (6 changes)",
+            "points": 10
+          }
+        ],
+        "confirmation_reason": "Canary 'MODIFIED' touched with strong ML + behavioral agreement (RF prob=0.66 >= 0.45, rules=[{'rule': 'EXTENSION_CHANGES', 'description': 'Multiple file extension changes detected (6 changes)', 'points': 10}])",
+        "confirmation_source": "CANARY_ML_ASSISTED"
+      },
+      "false_alert": false,
+      "alert_id": "alert-rg-36b2422f9a9c-1791461791",
+      "final_status": "OPEN"
+    },
+    {
+      "policy": "CANARY_ASSISTED",
+      "confirmation_source": "CANARY_ML_ASSISTED",
+      "fresh_rf_evidence": true,
+      "rf_signal_age_ms": 0.0,
+      "speed": "slow",
+      "seed": 103,
+      "first_canary_index": 10,
+      "candidate_pool": {
+        "real_target_files": 19,
+        "canary_files": 5,
+        "total_candidate_paths": 24
+      },
+      "timestamps": {
+        "attack_start": 1791461792.84975,
+        "raw_detection_time": 1791461795.8843348,
+        "standard_confirmed_time": null,
+        "canary_event_time": 1791461792.897692,
+        "canary_confirmed_time": 1791461795.8843348,
+        "containment_request_time": 1791461795.8843572,
+        "containment_complete_time": 1791461795.9058602
+      },
+      "latencies": {
+        "TTD_raw": 3.0346,
+        "TTD_standard": null,
+        "TTD_canary": 3.0346,
+        "TTC": 0.0215,
+        "total_response_time": 3.0561,
+        "time_saved_vs_standard": null,
+        "time_to_first_canary": 0.0479
+      },
+      "file_impact": {
+        "real_files_total": 19,
+        "canary_files_total": 5,
+        "real_files_affected_before_containment": 7,
+        "canary_files_affected_before_containment": 1,
+        "files_protected": 12,
+        "protection_percentage": 63.16
+      },
+      "decision_details": {
+        "canary_event_type": "MODIFIED",
+        "rf_probability": 0.655,
+        "rule_score": 10,
+        "extension_change_count": 0,
+        "mean_entropy": 5.9666,
+        "triggered_rules": [
+          {
+            "rule": "EXTENSION_CHANGES",
+            "description": "Multiple file extension changes detected (7 changes)",
+            "points": 10
+          }
+        ],
+        "confirmation_reason": "Canary 'MODIFIED' touched with strong ML + behavioral agreement (RF prob=0.66 >= 0.45, rules=[{'rule': 'EXTENSION_CHANGES', 'description': 'Multiple file extension changes detected (7 changes)', 'points': 10}])",
+        "confirmation_source": "CANARY_ML_ASSISTED"
+      },
+      "false_alert": false,
+      "alert_id": "alert-rg-36b2422f9a9c-1791461795",
+      "final_status": "OPEN"
+    },
+    {
+      "policy": "CANARY_ASSISTED",
+      "confirmation_source": "CANARY_ML_ASSISTED",
+      "fresh_rf_evidence": true,
+      "rf_signal_age_ms": 0.0,
+      "speed": "medium",
+      "seed": 201,
+      "first_canary_index": 14,
+      "candidate_pool": {
+        "real_target_files": 19,
+        "canary_files": 5,
+        "total_candidate_paths": 24
+      },
+      "timestamps": {
+        "attack_start": 1791461797.183958,
+        "raw_detection_time": 1791461798.2304728,
+        "standard_confirmed_time": null,
+        "canary_event_time": 1791461797.2365625,
+        "canary_confirmed_time": 1791461798.2304728,
+        "containment_request_time": 1791461798.2304912,
+        "containment_complete_time": 1791461798.278936
+      },
+      "latencies": {
+        "TTD_raw": 1.0465,
+        "TTD_standard": null,
+        "TTD_canary": 1.0465,
+        "TTC": 0.0485,
+        "total_response_time": 1.095,
+        "time_saved_vs_standard": null,
+        "time_to_first_canary": 0.0526
+      },
+      "file_impact": {
+        "real_files_total": 19,
+        "canary_files_total": 5,
+        "real_files_affected_before_containment": 8,
+        "canary_files_affected_before_containment": 2,
+        "files_protected": 11,
+        "protection_percentage": 57.89
+      },
+      "decision_details": {
+        "canary_event_type": "MODIFIED",
+        "rf_probability": 0.66,
+        "rule_score": 10,
+        "extension_change_count": 0,
+        "mean_entropy": 6.0215,
+        "triggered_rules": [
+          {
+            "rule": "EXTENSION_CHANGES",
+            "description": "Multiple file extension changes detected (7 changes)",
+            "points": 10
+          }
+        ],
+        "confirmation_reason": "Canary 'MODIFIED' touched with strong ML + behavioral agreement (RF prob=0.66 >= 0.45, rules=[{'rule': 'EXTENSION_CHANGES', 'description': 'Multiple file extension changes detected (7 changes)', 'points': 10}])",
+        "confirmation_source": "CANARY_ML_ASSISTED"
+      },
+      "false_alert": false,
+      "alert_id": "alert-rg-36b2422f9a9c-1791461798",
+      "final_status": "OPEN"
+    },
+    {
+      "policy": "CANARY_ASSISTED",
+      "confirmation_source": "CANARY_ML_ASSISTED",
+      "fresh_rf_evidence": true,
+      "rf_signal_age_ms": 0.0,
+      "speed": "medium",
+      "seed": 202,
+      "first_canary_index": 4,
+      "candidate_pool": {
+        "real_target_files": 19,
+        "canary_files": 5,
+        "total_candidate_paths": 24
+      },
+      "timestamps": {
+        "attack_start": 1791461799.5116513,
+        "raw_detection_time": 1791461800.5930126,
+        "standard_confirmed_time": null,
+        "canary_event_time": 1791461799.5544353,
+        "canary_confirmed_time": 1791461800.5930126,
+        "containment_request_time": 1791461800.593028,
+        "containment_complete_time": 1791461800.6259902
+      },
+      "latencies": {
+        "TTD_raw": 1.0814,
+        "TTD_standard": null,
+        "TTD_canary": 1.0814,
+        "TTC": 0.033,
+        "total_response_time": 1.1143,
+        "time_saved_vs_standard": null,
+        "time_to_first_canary": 0.0428
+      },
+      "file_impact": {
+        "real_files_total": 19,
+        "canary_files_total": 5,
+        "real_files_affected_before_containment": 7,
+        "canary_files_affected_before_containment": 3,
+        "files_protected": 12,
+        "protection_percentage": 63.16
+      },
+      "decision_details": {
+        "canary_event_type": "MODIFIED",
+        "rf_probability": 0.66,
+        "rule_score": 10,
+        "extension_change_count": 0,
+        "mean_entropy": 6.0985,
+        "triggered_rules": [
+          {
+            "rule": "EXTENSION_CHANGES",
+            "description": "Multiple file extension changes detected (7 changes)",
+            "points": 10
+          }
+        ],
+        "confirmation_reason": "Canary 'MODIFIED' touched with strong ML + behavioral agreement (RF prob=0.66 >= 0.45, rules=[{'rule': 'EXTENSION_CHANGES', 'description': 'Multiple file extension changes detected (7 changes)', 'points': 10}])",
+        "confirmation_source": "CANARY_ML_ASSISTED"
+      },
+      "false_alert": false,
+      "alert_id": "alert-rg-36b2422f9a9c-1791461800",
+      "final_status": "OPEN"
+    },
+    {
+      "policy": "CANARY_ASSISTED",
+      "confirmation_source": "CANARY_ML_ASSISTED",
+      "fresh_rf_evidence": true,
+      "rf_signal_age_ms": 0.0,
+      "speed": "medium",
+      "seed": 203,
+      "first_canary_index": 2,
+      "candidate_pool": {
+        "real_target_files": 19,
+        "canary_files": 5,
+        "total_candidate_paths": 24
+      },
+      "timestamps": {
+        "attack_start": 1791461801.9575572,
+        "raw_detection_time": 1791461803.060497,
+        "standard_confirmed_time": null,
+        "canary_event_time": 1791461802.005953,
+        "canary_confirmed_time": 1791461803.060497,
+        "containment_request_time": 1791461803.0605128,
+        "containment_complete_time": 1791461803.0839643
+      },
+      "latencies": {
+        "TTD_raw": 1.1029,
+        "TTD_standard": null,
+        "TTD_canary": 1.1029,
+        "TTC": 0.0235,
+        "total_response_time": 1.1264,
+        "time_saved_vs_standard": null,
+        "time_to_first_canary": 0.0484
+      },
+      "file_impact": {
+        "real_files_total": 19,
+        "canary_files_total": 5,
+        "real_files_affected_before_containment": 8,
+        "canary_files_affected_before_containment": 2,
+        "files_protected": 11,
+        "protection_percentage": 57.89
+      },
+      "decision_details": {
+        "canary_event_type": "MODIFIED",
+        "rf_probability": 0.665,
+        "rule_score": 10,
+        "extension_change_count": 0,
+        "mean_entropy": 6.0645,
+        "triggered_rules": [
+          {
+            "rule": "EXTENSION_CHANGES",
+            "description": "Multiple file extension changes detected (7 changes)",
+            "points": 10
+          }
+        ],
+        "confirmation_reason": "Canary 'MODIFIED' touched with strong ML + behavioral agreement (RF prob=0.67 >= 0.45, rules=[{'rule': 'EXTENSION_CHANGES', 'description': 'Multiple file extension changes detected (7 changes)', 'points': 10}])",
+        "confirmation_source": "CANARY_ML_ASSISTED"
+      },
+      "false_alert": false,
+      "alert_id": "alert-rg-36b2422f9a9c-1791461803",
+      "final_status": "OPEN"
+    },
+    {
+      "policy": "CANARY_ASSISTED",
+      "confirmation_source": "CANARY_ML_ASSISTED",
+      "fresh_rf_evidence": true,
+      "rf_signal_age_ms": 0.0,
+      "speed": "fast",
+      "seed": 301,
+      "first_canary_index": 6,
+      "candidate_pool": {
+        "real_target_files": 19,
+        "canary_files": 5,
+        "total_candidate_paths": 24
+      },
+      "timestamps": {
+        "attack_start": 1791461804.3760297,
+        "raw_detection_time": 1791461805.147663,
+        "standard_confirmed_time": null,
+        "canary_event_time": 1791461804.4307222,
+        "canary_confirmed_time": 1791461805.147663,
+        "containment_request_time": 1791461805.1476798,
+        "containment_complete_time": 1791461805.1476798
+      },
+      "latencies": {
+        "TTD_raw": 0.7716,
+        "TTD_standard": null,
+        "TTD_canary": 0.7716,
+        "TTC": 0.0001,
+        "total_response_time": 0.7717,
+        "time_saved_vs_standard": null,
+        "time_to_first_canary": 0.0547
+      },
+      "file_impact": {
+        "real_files_total": 19,
+        "canary_files_total": 5,
+        "real_files_affected_before_containment": 17,
+        "canary_files_affected_before_containment": 3,
+        "files_protected": 2,
+        "protection_percentage": 10.53
+      },
+      "decision_details": {
+        "canary_event_type": "MODIFIED",
+        "rf_probability": 0.67,
+        "rule_score": 30,
+        "extension_change_count": 0,
+        "mean_entropy": 6.3831,
+        "triggered_rules": [
+          {
+            "rule": "MASS_FILE_MODIFICATION",
+            "description": "Large number of files modified (32 files)",
+            "points": 20
+          },
+          {
+            "rule": "EXTENSION_CHANGES",
+            "description": "Multiple file extension changes detected (14 changes)",
+            "points": 10
+          }
+        ],
+        "confirmation_reason": "Canary 'MODIFIED' touched with strong ML + behavioral agreement (RF prob=0.67 >= 0.45, rules=[{'rule': 'MASS_FILE_MODIFICATION', 'description': 'Large number of files modified (32 files)', 'points': 20}, {'rule': 'EXTENSION_CHANGES', 'description': 'Multiple file extension changes detected (14 changes)', 'points': 10}])",
+        "confirmation_source": "CANARY_ML_ASSISTED"
+      },
+      "false_alert": false,
+      "alert_id": "alert-rg-36b2422f9a9c-1791461805",
+      "final_status": "OPEN"
+    },
+    {
+      "policy": "CANARY_ASSISTED",
+      "confirmation_source": "CANARY_ML_ASSISTED",
+      "fresh_rf_evidence": true,
+      "rf_signal_age_ms": 0.0,
+      "speed": "fast",
+      "seed": 302,
+      "first_canary_index": 22,
+      "candidate_pool": {
+        "real_target_files": 19,
+        "canary_files": 5,
+        "total_candidate_paths": 24
+      },
+      "timestamps": {
+        "attack_start": 1791461806.4239526,
+        "raw_detection_time": 1791461806.9221623,
+        "standard_confirmed_time": null,
+        "canary_event_time": 1791461806.4802403,
+        "canary_confirmed_time": 1791461806.9221623,
+        "containment_request_time": 1791461806.9221752,
+        "containment_complete_time": 1791461806.9286199
+      },
+      "latencies": {
+        "TTD_raw": 0.4982,
+        "TTD_standard": null,
+        "TTD_canary": 0.4982,
+        "TTC": 0.0065,
+        "total_response_time": 0.5047,
+        "time_saved_vs_standard": null,
+        "time_to_first_canary": 0.0563
+      },
+      "file_impact": {
+        "real_files_total": 19,
+        "canary_files_total": 5,
+        "real_files_affected_before_containment": 13,
+        "canary_files_affected_before_containment": 3,
+        "files_protected": 6,
+        "protection_percentage": 31.58
+      },
+      "decision_details": {
+        "canary_event_type": "MODIFIED",
+        "rf_probability": 0.665,
+        "rule_score": 10,
+        "extension_change_count": 0,
+        "mean_entropy": 6.006,
+        "triggered_rules": [
+          {
+            "rule": "EXTENSION_CHANGES",
+            "description": "Multiple file extension changes detected (8 changes)",
+            "points": 10
+          }
+        ],
+        "confirmation_reason": "Canary 'MODIFIED' touched with strong ML + behavioral agreement (RF prob=0.67 >= 0.45, rules=[{'rule': 'EXTENSION_CHANGES', 'description': 'Multiple file extension changes detected (8 changes)', 'points': 10}])",
+        "confirmation_source": "CANARY_ML_ASSISTED"
+      },
+      "false_alert": false,
+      "alert_id": "alert-rg-36b2422f9a9c-1791461806",
+      "final_status": "OPEN"
+    },
+    {
+      "policy": "CANARY_ASSISTED",
+      "confirmation_source": "CANARY_ML_ASSISTED",
+      "fresh_rf_evidence": true,
+      "rf_signal_age_ms": 0.0,
+      "speed": "fast",
+      "seed": 303,
+      "first_canary_index": 0,
+      "candidate_pool": {
+        "real_target_files": 19,
+        "canary_files": 5,
+        "total_candidate_paths": 24
+      },
+      "timestamps": {
+        "attack_start": 1791461808.2280655,
+        "raw_detection_time": 1791461809.035816,
+        "standard_confirmed_time": null,
+        "canary_event_time": 1791461808.2918375,
+        "canary_confirmed_time": 1791461809.035816,
+        "containment_request_time": 1791461809.035831,
+        "containment_complete_time": 1791461809.035831
+      },
+      "latencies": {
+        "TTD_raw": 0.8078,
+        "TTD_standard": null,
+        "TTD_canary": 0.8078,
+        "TTC": 0.0001,
+        "total_response_time": 0.8078,
+        "time_saved_vs_standard": null,
+        "time_to_first_canary": 0.0638
+      },
+      "file_impact": {
+        "real_files_total": 19,
+        "canary_files_total": 5,
+        "real_files_affected_before_containment": 15,
+        "canary_files_affected_before_containment": 5,
+        "files_protected": 4,
+        "protection_percentage": 21.05
+      },
+      "decision_details": {
+        "canary_event_type": "MODIFIED",
+        "rf_probability": 0.67,
+        "rule_score": 30,
+        "extension_change_count": 0,
+        "mean_entropy": 6.4254,
+        "triggered_rules": [
+          {
+            "rule": "MASS_FILE_MODIFICATION",
+            "description": "Large number of files modified (33 files)",
+            "points": 20
+          },
+          {
+            "rule": "EXTENSION_CHANGES",
+            "description": "Multiple file extension changes detected (14 changes)",
+            "points": 10
+          }
+        ],
+        "confirmation_reason": "Canary 'MODIFIED' touched with strong ML + behavioral agreement (RF prob=0.67 >= 0.45, rules=[{'rule': 'MASS_FILE_MODIFICATION', 'description': 'Large number of files modified (33 files)', 'points': 20}, {'rule': 'EXTENSION_CHANGES', 'description': 'Multiple file extension changes detected (14 changes)', 'points': 10}])",
+        "confirmation_source": "CANARY_ML_ASSISTED"
+      },
+      "false_alert": false,
+      "alert_id": "alert-rg-36b2422f9a9c-1791461809",
+      "final_status": "OPEN"
+    }
+  ],
+  "canary_density_experiment": [
+    {
+      "canary_count": 1,
+      "time_to_canary_hit": 0.0415,
+      "TTD_canary": 0.487,
+      "real_files_affected_before_containment": 5,
+      "files_protected": 14,
+      "protection_percentage": 73.68
+    },
+    {
+      "canary_count": 3,
+      "time_to_canary_hit": 0.0411,
+      "TTD_canary": 0.8484,
+      "real_files_affected_before_containment": 8,
+      "files_protected": 11,
+      "protection_percentage": 57.89
+    },
+    {
+      "canary_count": 5,
+      "time_to_canary_hit": 0.0405,
+      "TTD_canary": 1.2737,
+      "real_files_affected_before_containment": 9,
+      "files_protected": 10,
+      "protection_percentage": 52.63
+    }
+  ],
+  "summary_by_speed": {
+    "slow": {
+      "baseline": {
+        "mean_TTD_raw_sec": 5.429,
+        "mean_TTD_confirmed_sec": 5.429,
+        "mean_real_files_affected": 11.3,
+        "mean_protected_pct": 40.4,
+        "false_confirmed_alerts": 0
+      },
+      "canary_assisted": {
+        "mean_TTD_raw_sec": 3.257,
+        "mean_TTD_canary_confirmed_sec": 3.257,
+        "mean_real_files_affected": 7.7,
+        "mean_protected_pct": 59.6,
+        "false_confirmed_alerts": 0
+      },
+      "delta": {
+        "time_saved_sec": 2.172,
+        "files_saved": 3.7,
+        "percentage_point_improvement": 19.3
+      }
+    },
+    "medium": {
+      "baseline": {
+        "mean_TTD_raw_sec": 0.0,
+        "mean_TTD_confirmed_sec": 0.0,
+        "mean_real_files_affected": 16.0,
+        "mean_protected_pct": 15.8,
+        "false_confirmed_alerts": 0
+      },
+      "canary_assisted": {
+        "mean_TTD_raw_sec": 1.077,
+        "mean_TTD_canary_confirmed_sec": 1.077,
+        "mean_real_files_affected": 7.7,
+        "mean_protected_pct": 59.6,
+        "false_confirmed_alerts": 0
+      },
+      "delta": {
+        "time_saved_sec": -1.077,
+        "files_saved": 8.3,
+        "percentage_point_improvement": 43.9
+      }
+    },
+    "fast": {
+      "baseline": {
+        "mean_TTD_raw_sec": 0.0,
+        "mean_TTD_confirmed_sec": 0.0,
+        "mean_real_files_affected": 16.0,
+        "mean_protected_pct": 15.8,
+        "false_confirmed_alerts": 0
+      },
+      "canary_assisted": {
+        "mean_TTD_raw_sec": 0.693,
+        "mean_TTD_canary_confirmed_sec": 0.693,
+        "mean_real_files_affected": 15.0,
+        "mean_protected_pct": 21.1,
+        "false_confirmed_alerts": 0
+      },
+      "delta": {
+        "time_saved_sec": -0.693,
+        "files_saved": 1.0,
+        "percentage_point_improvement": 5.3
+      }
+    }
+  }
+}

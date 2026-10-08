@@ -1,0 +1,16 @@
+{
+  "telemetry_disabled": {
+    "avg_cpu_pct": 0.0,
+    "peak_cpu_pct": 0.0,
+    "rss_mb": 180.89
+  },
+  "telemetry_enabled": {
+    "avg_cpu_pct": 9.33,
+    "peak_cpu_pct": 93.3,
+    "rss_mb": 180.41,
+    "cache_refresh_ms_mean": 474.746,
+    "cache_refresh_ms_p95": 4185.911,
+    "attribution_latency_ms_mean": 8.645,
+    "attribution_latency_ms_p95": 86.352
+  }
+}

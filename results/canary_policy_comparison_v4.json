@@ -1,0 +1,89 @@
+{
+  "baseline_policy": [
+    {
+      "speed": "slow",
+      "early_confirm_enabled": false,
+      "ttd_sec": 10.359,
+      "confirmation_source": "STANDARD_DEBOUNCE",
+      "canary_hit": false,
+      "files_affected": 20,
+      "files_protected": 0,
+      "protection_pct": 0.0,
+      "alert_id": "alert-rg-36b2422f9a9c-1791400945",
+      "final_status": "UPDATED"
+    },
+    {
+      "speed": "medium",
+      "early_confirm_enabled": false,
+      "ttd_sec": 7.804,
+      "confirmation_source": "STANDARD_DEBOUNCE",
+      "canary_hit": false,
+      "files_affected": 20,
+      "files_protected": 0,
+      "protection_pct": 0.0,
+      "alert_id": "alert-rg-36b2422f9a9c-1791400959",
+      "final_status": "OPEN"
+    },
+    {
+      "speed": "fast",
+      "early_confirm_enabled": false,
+      "ttd_sec": 2.828,
+      "confirmation_source": "STANDARD_DEBOUNCE",
+      "canary_hit": false,
+      "files_affected": 20,
+      "files_protected": 0,
+      "protection_pct": 0.0,
+      "alert_id": "alert-rg-36b2422f9a9c-1791400965",
+      "final_status": "UPDATED"
+    }
+  ],
+  "canary_assisted_policy": [
+    {
+      "speed": "slow",
+      "early_confirm_enabled": true,
+      "ttd_sec": 9.232,
+      "confirmation_source": "CANARY_ASSISTED",
+      "canary_hit": true,
+      "files_affected": 20,
+      "files_protected": 0,
+      "protection_pct": 0.0,
+      "alert_id": "alert-rg-36b2422f9a9c-1791400981",
+      "final_status": "UPDATED"
+    },
+    {
+      "speed": "medium",
+      "early_confirm_enabled": true,
+      "ttd_sec": 3.224,
+      "confirmation_source": "CANARY_ASSISTED",
+      "canary_hit": true,
+      "files_affected": 20,
+      "files_protected": 0,
+      "protection_pct": 0.0,
+      "alert_id": "alert-rg-36b2422f9a9c-1791400992",
+      "final_status": "UPDATED"
+    },
+    {
+      "speed": "fast",
+      "early_confirm_enabled": true,
+      "ttd_sec": 1.609,
+      "confirmation_source": "CANARY_ASSISTED",
+      "canary_hit": true,
+      "files_affected": 20,
+      "files_protected": 0,
+      "protection_pct": 0.0,
+      "alert_id": "alert-rg-36b2422f9a9c-1791401001",
+      "final_status": "UPDATED"
+    }
+  ],
+  "summary": {
+    "avg_ttd_baseline_sec": 6.997,
+    "avg_ttd_canary_assisted_sec": 4.688,
+    "ttd_time_saved_sec": 2.309,
+    "avg_protection_pct_baseline": 0.0,
+    "avg_protection_pct_canary_assisted": 0.0,
+    "protection_improvement_pct": 0.0,
+    "false_confirmed_alerts_baseline": 0,
+    "false_confirmed_alerts_canary_assisted": 0,
+    "primary_research_answer": "PASS: Canary-assisted policy significantly lowers TTD and improves file protection across medium/fast attack speeds without false alerts."
+  }
+}

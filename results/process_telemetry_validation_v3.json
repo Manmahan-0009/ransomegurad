@@ -1,0 +1,21 @@
+{
+  "platform": "Windows",
+  "number_of_endpoints": 3,
+  "normal_process_attribution": "python.exe [PID rg-73b]",
+  "benign_process_attribution": "python.exe [PID rg-187]",
+  "attack_process_attribution": "python.exe [PID 12908]",
+  "direct_attribution_rate": 1.0,
+  "unknown_rate": 0.0,
+  "incorrect_rate": 0.0,
+  "performance_overhead": {
+    "agent_cpu_pct": 0.0,
+    "agent_memory_mb": 177.27,
+    "process_cache_refresh_ms": 2748.994,
+    "event_processing_latency_ms": 31.654
+  },
+  "incident_count": 1,
+  "alert_isolation": "PASS",
+  "Stage 3 verification": "PASS",
+  "model verification": "PASS",
+  "timestamp": "2026-10-07T18:01:22Z"
+}

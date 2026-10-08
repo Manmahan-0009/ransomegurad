@@ -1,0 +1,19 @@
+{
+  "overhead_classification": "Low measured canary-processing overhead. Path matching is sub-millisecond in this test run, while hash verification and database persistence may exceed 1 ms.",
+  "canary_disabled": {
+    "avg_cpu_pct": 0.0,
+    "peak_cpu_pct": 0.0,
+    "rss_mb": 182.27
+  },
+  "canary_enabled": {
+    "avg_cpu_pct": 1.55,
+    "peak_cpu_pct": 31.0,
+    "rss_mb": 182.71,
+    "matching_latency_ms_mean": 0.3953,
+    "matching_latency_ms_p95": 0.7663,
+    "hash_verification_ms_mean": 0.5797,
+    "hash_verification_ms_p95": 0.6472,
+    "db_event_write_ms_mean": 1.4589,
+    "db_event_write_ms_p95": 2.8381
+  }
+}

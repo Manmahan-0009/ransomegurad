@@ -1,0 +1,19 @@
+{
+  "overhead_classification": "sub-millisecond measured processing overhead",
+  "canary_disabled": {
+    "avg_cpu_pct": 6.18,
+    "peak_cpu_pct": 30.9,
+    "rss_mb": 180.0
+  },
+  "canary_enabled": {
+    "avg_cpu_pct": 1.54,
+    "peak_cpu_pct": 30.8,
+    "rss_mb": 180.61,
+    "matching_latency_ms_mean": 0.5466,
+    "matching_latency_ms_p95": 0.9062,
+    "hash_verification_ms_mean": 0.768,
+    "hash_verification_ms_p95": 1.5499,
+    "db_event_write_ms_mean": 1.0116,
+    "db_event_write_ms_p95": 2.9237
+  }
+}

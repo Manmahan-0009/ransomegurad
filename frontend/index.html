@@ -2,121 +2,180 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RansomGuard | Threat Command Center</title>
-
+    <title>RansomGuard | Multi-Endpoint Threat Command Center</title>
     <!-- RansomGuard Dashboard CSS -->
     <link rel="stylesheet" href="/static/style.css">
-
 </head>
-
 
 <body>
 
     <div class="app">
 
-
         <!-- ================================================= -->
         <!-- HEADER -->
         <!-- ================================================= -->
-
         <header class="topbar">
-
             <div class="brand">
-
-                <div class="brand-icon">
-                    🛡️
-                </div>
-
+                <div class="brand-icon">🛡️</div>
                 <div>
                     <h1>RANSOMGUARD</h1>
-                    <p>REAL-TIME THREAT COMMAND CENTER</p>
+                    <p>MULTI-ENDPOINT THREAT COMMAND CENTER (V3.1 LAN)</p>
                 </div>
-
             </div>
-
 
             <div class="system-status">
                 <span class="status-dot" id="statusDot"></span>
-                <span id="connectionStatus">SYSTEM ONLINE</span>
+                <span id="connectionStatus">CENTRAL SERVER ONLINE</span>
             </div>
-
         </header>
-
 
 
         <!-- ================================================= -->
         <!-- MAIN DASHBOARD -->
         <!-- ================================================= -->
-
         <main class="dashboard">
 
-
             <!-- ================================================= -->
-            <!-- CURRENT STATUS / THREAT SCORE -->
+            <!-- 1. ACTIVE SECURITY INCIDENTS (HIGH VISUAL PRIORITY) -->
             <!-- ================================================= -->
-
-            <section class="score-card">
-
+            <section class="active-incidents-card">
                 <div class="card-header">
-                    <span>CURRENT STATUS</span>
+                    <span class="txt-danger">🚨 ACTIVE SECURITY INCIDENTS</span>
+                    <span class="badge-status-red" id="activeIncidentsBadge">0 OPEN INCIDENTS</span>
+                </div>
+
+                <div id="activeIncidentsGrid" class="incidents-grid">
+                    <div class="empty-incidents-state">
+                        <span class="shield-check">🛡️</span>
+                        <p>No active security incidents detected. All LAN endpoints operating safely.</p>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- 2. ENDPOINTS OVERVIEW SECTION -->
+            <!-- ================================================= -->
+            <section class="device-overview-card">
+                <div class="card-header">
+                    <span>MONITORED LAN ENDPOINTS</span>
+                    <span class="live-label">CENTRAL REGISTRY</span>
+                </div>
+
+                <!-- Endpoint Metrics Counter Bar -->
+                <div class="device-metrics-bar">
+                    <div class="dev-metric">
+                        <span class="dev-metric-label">TOTAL DEVICES</span>
+                        <strong id="deviceCountTotal">0</strong>
+                    </div>
+                    <div class="dev-metric">
+                        <span class="dev-metric-label">ONLINE</span>
+                        <strong id="deviceCountOnline" class="txt-online">0</strong>
+                    </div>
+                    <div class="dev-metric">
+                        <span class="dev-metric-label">OFFLINE</span>
+                        <strong id="deviceCountOffline" class="txt-offline">0</strong>
+                    </div>
+                    <div class="dev-metric">
+                        <span class="dev-metric-label">SAFE (LOW)</span>
+                        <strong id="deviceCountLow" class="txt-low">0</strong>
+                    </div>
+                    <div class="dev-metric">
+                        <span class="dev-metric-label">WARNING (MEDIUM)</span>
+                        <strong id="deviceCountMedium" class="txt-medium">0</strong>
+                    </div>
+                    <div class="dev-metric">
+                        <span class="dev-metric-label">THREAT (HIGH/CRIT)</span>
+                        <strong id="deviceCountHigh" class="txt-high">0</strong>
+                    </div>
+                </div>
+
+                <!-- Devices Grid / Cards -->
+                <div id="devicesGrid" class="devices-grid">
+                    <div class="empty-state">No RansomGuard endpoints connected.</div>
+                </div>
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- 3. LIVE SECURITY LOG (PERMANENT EVENT FEED) -->
+            <!-- ================================================= -->
+            <section class="event-card">
+                <div class="card-header">
+                    <span>LIVE SECURITY LOG</span>
+                    <span class="history-badge">REAL-TIME EVENT STREAM</span>
+                </div>
+
+                <div id="eventLog" class="event-log">
+                    <div class="log-entry">
+                        <span class="log-time">--:--:--</span>
+                        <span class="log-badge badge-system">SYSTEM</span>
+                        <span class="log-msg">Initializing RansomGuard live security log feed...</span>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- 4. RECENT / RESOLVED INCIDENT HISTORY -->
+            <!-- ================================================= -->
+            <section class="resolved-incidents-card">
+                <div class="card-header">
+                    <span>RECENT / RESOLVED INCIDENTS HISTORY</span>
+                    <span class="history-badge">ARCHIVED THREATS</span>
+                </div>
+
+                <div id="resolvedIncidentsGrid" class="resolved-grid">
+                    <div class="empty-state">No resolved incidents in history.</div>
+                </div>
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- 5. SELECTED ENDPOINT DETAILS & TELEMETRY -->
+            <!-- ================================================= -->
+            <section class="score-card">
+                <div class="card-header">
+                    <span>SELECTED ENDPOINT STATE</span>
                     <span class="live-label" id="liveIndicator">● LIVE</span>
                 </div>
 
-
                 <div class="score-content">
-
                     <div class="score-circle" id="scoreCircle">
                         <span id="threatScore">0.0</span>
                         <small>/ 100</small>
                     </div>
 
-
                     <div class="threat-status">
-
-                        <span class="label">CURRENT THREAT STATE</span>
-
+                        <span class="label">ACTIVE ENDPOINT THREAT STATE</span>
                         <h2 id="threatStatus">NO ACTIVE THREAT</h2>
-
                         <p id="severity">Severity: LOW</p>
-
                         <div class="debounce-badge" id="debounceBadge">
                             Confirmed Alert: NO
                         </div>
-
                     </div>
-
                 </div>
-
             </section>
 
 
-
-            <!-- ================================================= -->
             <!-- AI DETECTION (ML) -->
-            <!-- ================================================= -->
-
             <section class="info-card">
-
                 <div class="card-header">
                     <span>AI DETECTION</span>
-                    <span>🤖 ML (RF_V1)</span>
+                    <span>🤖 ML (RF_V2)</span>
                 </div>
-
 
                 <div class="metric">
                     <span>Prediction</span>
                     <strong id="prediction">BENIGN</strong>
                 </div>
 
-
                 <div class="metric">
                     <span>Threat Probability</span>
                     <strong id="threatProbability">0.0%</strong>
                 </div>
-
 
                 <div class="metric">
                     <span>Benign Probability</span>
@@ -125,219 +184,233 @@
 
                 <div class="metric">
                     <span>RF Threshold</span>
-                    <strong id="rfThreshold">0.15</strong>
+                    <strong id="rfThreshold">0.20</strong>
                 </div>
-
             </section>
 
 
-
-            <!-- ================================================= -->
             <!-- RULE ENGINE -->
-            <!-- ================================================= -->
-
             <section class="info-card">
-
                 <div class="card-header">
                     <span>RULE ENGINE</span>
-                    <span>📏 RULES (6 RULES)</span>
+                    <span>📏 HYBRID RULES</span>
                 </div>
-
 
                 <div class="metric">
                     <span>Rule Score</span>
                     <strong id="ruleScore">0</strong>
                 </div>
 
-
                 <div class="metric">
                     <span>Rules Triggered</span>
                     <strong id="rulesTriggered">0</strong>
                 </div>
 
-
                 <div class="metric">
                     <span>Detection Mode</span>
-                    <strong>HYBRID (60/40)</strong>
+                    <strong>HYBRID (70/30)</strong>
                 </div>
 
                 <div class="metric">
                     <span>Min Rename Count</span>
                     <strong id="minRenameCount">5</strong>
                 </div>
-
             </section>
 
 
-
-            <!-- ================================================= -->
-            <!-- CURRENT WINDOW LIVE SECURITY EVENT -->
-            <!-- ================================================= -->
-
-            <section class="alert-card">
-
+            <!-- CANARY PROTECTION -->
+            <section class="info-card">
                 <div class="card-header">
-                    <span>CURRENT WINDOW EVENT</span>
-                    <span id="eventIndicator" class="badge-status">WAITING</span>
+                    <span>CANARY PROTECTION</span>
+                    <span>🐥 DECOY EARLY-WARNING</span>
                 </div>
 
-
-                <div class="alert-content">
-
-                    <div class="alert-icon" id="alertIcon">
-                        🟢
-                    </div>
-
-                    <div>
-                        <h2 id="alertTitle">System Monitoring Active</h2>
-                        <p id="alertMessage">RansomGuard is actively monitoring filesystem telemetry windows.</p>
-                    </div>
-
+                <div class="metric">
+                    <span>Protection Status</span>
+                    <strong id="canaryStatusBadge" class="txt-online">ENABLED</strong>
                 </div>
 
+                <div class="metric">
+                    <span>Active Canaries</span>
+                    <strong id="canaryActiveCount">5</strong>
+                </div>
+
+                <div class="metric">
+                    <span>Last Canary Event</span>
+                    <strong id="canaryLastEventType">NONE</strong>
+                </div>
+
+                <div class="metric">
+                    <span>Early Confirmation</span>
+                    <strong id="canaryEarlyConfirmState">STANDBY</strong>
+                </div>
             </section>
 
 
-
-            <!-- ================================================= -->
             <!-- TRIGGERED RULES -->
-            <!-- ================================================= -->
-
             <section class="rules-card">
-
                 <div class="card-header">
-                    <span>TRIGGERED RULES (CURRENT WINDOW)</span>
+                    <span>TRIGGERED RULES</span>
                     <span id="ruleCount">0 RULES</span>
                 </div>
 
-
                 <div id="rulesList" class="rules-list">
-                    <div class="empty-state">No rules triggered in current window.</div>
+                    <div class="empty-state">No rules triggered.</div>
                 </div>
-
             </section>
 
-            <!-- ================================================= -->
+
             <!-- BEHAVIORAL TELEMETRY (11 FEATURES) -->
-            <!-- ================================================= -->
-
             <section class="features-card">
-
                 <div class="card-header">
                     <span>BEHAVIORAL TELEMETRY</span>
                     <span>📊 11 CANONICAL FEATURES</span>
                 </div>
 
-
                 <div id="featuresGrid" class="features-grid">
-
                     <div class="feature-item">
                         <span class="feature-label">Files Created</span>
                         <span class="feature-value" id="feat_files_created">0</span>
                     </div>
-
                     <div class="feature-item">
                         <span class="feature-label">Files Modified</span>
                         <span class="feature-value" id="feat_files_modified">0</span>
                     </div>
-
                     <div class="feature-item">
                         <span class="feature-label">Files Deleted</span>
                         <span class="feature-value" id="feat_files_deleted">0</span>
                     </div>
-
                     <div class="feature-item">
                         <span class="feature-label">Files Renamed</span>
                         <span class="feature-value" id="feat_files_renamed">0</span>
                     </div>
-
                     <div class="feature-item">
                         <span class="feature-label">Writes/sec</span>
                         <span class="feature-value" id="feat_writes_per_second">0.0</span>
                     </div>
-
                     <div class="feature-item">
                         <span class="feature-label">Unique Exts</span>
                         <span class="feature-value" id="feat_unique_extensions">0</span>
                     </div>
-
                     <div class="feature-item">
                         <span class="feature-label">Unique Dirs</span>
                         <span class="feature-value" id="feat_unique_directories">0</span>
                     </div>
-
                     <div class="feature-item">
                         <span class="feature-label">Ext Changes</span>
                         <span class="feature-value" id="feat_extension_change_count">0</span>
                     </div>
-
                     <div class="feature-item">
                         <span class="feature-label">Rename Ratio</span>
                         <span class="feature-value" id="feat_rename_ratio">0.00</span>
                     </div>
-
                     <div class="feature-item">
                         <span class="feature-label">Mean Entropy</span>
                         <span class="feature-value" id="feat_mean_entropy">0.000</span>
                     </div>
-
                     <div class="feature-item">
                         <span class="feature-label">Entropy Change</span>
                         <span class="feature-value" id="feat_entropy_change">0.000</span>
                     </div>
-
                 </div>
-
             </section>
-
-
-
-
-            <!-- ================================================= -->
-            <!-- RECENT DETECTION HISTORY -->
-            <!-- ================================================= -->
-
-            <section class="event-card">
-
-                <div class="card-header">
-                    <span>RECENT DETECTION HISTORY</span>
-                    <span class="history-badge">PERSISTENT LOG</span>
-                </div>
-
-
-                <div id="eventLog" class="event-log">
-                    <div class="log-entry">
-                        <span class="log-time">--:--:--</span>
-                        <span class="log-msg">Waiting for live telemetry connection...</span>
-                    </div>
-                </div>
-
-            </section>
-
 
         </main>
 
+
+        <!-- ================================================= -->
+        <!-- DEVICE DETAIL MODAL -->
+        <!-- ================================================= -->
+        <div id="deviceModalOverlay" class="modal-overlay hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h2 id="modalHostname">DEVICE DETAILS</h2>
+                        <span id="modalDeviceId" class="modal-sub">ID: --</span>
+                    </div>
+                    <button id="modalCloseBtn" class="modal-close-btn">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- Device Meta Grid -->
+                    <div class="modal-meta-grid">
+                        <div><span>OS:</span> <strong id="modalOs">--</strong></div>
+                        <div><span>Agent Version:</span> <strong id="modalAgentVer">--</strong></div>
+                        <div><span>Model Version:</span> <strong id="modalModelVer">--</strong></div>
+                        <div><span>Status:</span> <strong id="modalStatus" class="txt-online">--</strong></div>
+                        <div><span>Last Seen:</span> <strong id="modalLastSeen">--</strong></div>
+                        <div><span>Current Severity:</span> <strong id="modalSeverity">--</strong></div>
+                    </div>
+
+                    <hr class="modal-divider">
+
+                    <h3>Active Security Incident</h3>
+                    <div id="modalActiveIncidentBox">
+                        <div class="empty-state">No active incident for this device.</div>
+                    </div>
+
+                    <hr class="modal-divider">
+
+                    <h3>Process Context (Associated Activity)</h3>
+                    <div id="modalProcessCard" class="modal-meta-grid">
+                        <div><span>Associated Process:</span> <strong id="modalProcName">--</strong></div>
+                        <div><span>PID:</span> <strong id="modalProcPid">--</strong></div>
+                        <div><span>Parent Process:</span> <strong id="modalProcParent">--</strong></div>
+                        <div><span>User:</span> <strong id="modalProcUser">--</strong></div>
+                        <div><span>Executable Path:</span> <small id="modalProcPath">--</small></div>
+                        <div><span>Attribution Confidence:</span> <strong id="modalProcConf" class="badge-status">--</strong></div>
+                    </div>
+
+                    <hr class="modal-divider">
+
+                    <h3>Canary Decoy Protection</h3>
+                    <div id="modalCanaryCard" class="modal-meta-grid">
+                        <div><span>Canary Status:</span> <strong id="modalCanaryStatus">ENABLED</strong></div>
+                        <div><span>Active Canaries:</span> <strong id="modalCanaryCount">5</strong></div>
+                        <div><span>Last Canary Event:</span> <strong id="modalCanaryLastEvent">NONE</strong></div>
+                        <div><span>Confirmation Source:</span> <strong id="modalCanarySource">STANDARD_DEBOUNCE</strong></div>
+                    </div>
+
+                    <hr class="modal-divider">
+
+                    <h3>Latest Telemetry Features</h3>
+                    <div id="modalFeaturesGrid" class="features-grid modal-features">
+                        <!-- Populated dynamically -->
+                    </div>
+
+                    <hr class="modal-divider">
+
+                    <h3>Device Security Logs</h3>
+                    <div id="modalLogsList" class="modal-list">
+                        <div class="empty-state">No logs recorded for this endpoint.</div>
+                    </div>
+
+                    <hr class="modal-divider">
+
+                    <h3>Incident History</h3>
+                    <div id="modalAlertsList" class="modal-list">
+                        <div class="empty-state">No past alerts recorded.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
         <!-- ================================================= -->
         <!-- FOOTER -->
         <!-- ================================================= -->
-
         <footer>
-            <span>RANSOMGUARD v1.3</span>
-            <span>REAL-TIME BEHAVIORAL THREAT DETECTION & FUSION</span>
-            <span>STATUS: <strong id="footerStatus">MONITORING</strong></span>
+            <span>RANSOMGUARD V3.1-LAN</span>
+            <span>REAL MULTI-ENDPOINT LAN ARCHITECTURE & PERSISTENT THREAT FUSION</span>
+            <span>STATUS: <strong id="footerStatus">CENTRAL SERVER MONITORING</strong></span>
         </footer>
-
 
     </div>
 
+    <!-- Toast Notification Overlay -->
+    <div id="toastContainer" class="toast-container"></div>
 
-
-    <!-- ================================================= -->
-    <!-- RANSOMGUARD JAVASCRIPT -->
-    <!-- ================================================= -->
-
+    <!-- RansomGuard Dashboard JavaScript -->
     <script src="/static/app.js"></script>
 
 </body>

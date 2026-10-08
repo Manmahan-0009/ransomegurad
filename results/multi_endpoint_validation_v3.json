@@ -1,0 +1,51 @@
+{
+  "central_server_version": "3.0-dev",
+  "agent_version": "3.0-dev",
+  "number_of_agents": 3,
+  "device_identities": [
+    {
+      "device_id": "rg-73b75ee668d5",
+      "hostname": "TEST-VM-01",
+      "scenario": "NORMAL",
+      "severity": "LOW"
+    },
+    {
+      "device_id": "rg-187723ca7206",
+      "hostname": "TEST-VM-02",
+      "scenario": "BENIGN",
+      "severity": "LOW"
+    },
+    {
+      "device_id": "rg-7cff74e8a3a2",
+      "hostname": "TEST-VM-03",
+      "scenario": "ATTACK",
+      "severity": "HIGH"
+    }
+  ],
+  "registration_status": "PASS",
+  "heartbeat_status": "PASS",
+  "scenario_per_endpoint": {
+    "TEST-VM-01": "NORMAL -> LOW",
+    "TEST-VM-02": "BENIGN -> LOW",
+    "TEST-VM-03": "ATTACK -> HIGH (Confirmed Alert)"
+  },
+  "max_threat_score_per_device": {
+    "TEST-VM-01": 0.0,
+    "TEST-VM-02": 0.0,
+    "TEST-VM-03": 72.3
+  },
+  "max_severity_per_device": {
+    "TEST-VM-01": "LOW",
+    "TEST-VM-02": "LOW",
+    "TEST-VM-03": "HIGH"
+  },
+  "confirmed_alerts_per_device": {
+    "TEST-VM-01": 0,
+    "TEST-VM-02": 0,
+    "TEST-VM-03": 8
+  },
+  "alert_isolation_result": "PASS",
+  "offline_online_test_result": "PASS",
+  "db_persistence_test_result": "PASS",
+  "timestamp": "2026-10-07T16:30:28Z"
+}

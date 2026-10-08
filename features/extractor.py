@@ -7,11 +7,46 @@ Used identically across live monitoring, dataset generation, model training, and
 """
 
 import os
-from pathlib import Path
-from typing import List, Dict, Any
+from pathlib import Path, PurePosixPath
+from typing import List, Dict, Any, Optional
 from monitoring.event_schema import StructuredEvent
 from utils.sandbox_manager import get_demo_dir
 from features.entropy import calculate_file_entropy, get_entropy_tracker
+
+
+def normalize_event_directory(path_str: Optional[str], monitored_root: Optional[Path] = None) -> Optional[str]:
+    """
+    Authoritative helper to determine relative normalized directory identity.
+    Counts parent directories relative to monitored root using forward slashes.
+
+    Examples:
+        sandbox/demo_folder/report.txt -> "."
+        sandbox/demo_folder/Documents/file.txt -> "Documents"
+        sandbox/demo_folder/Documents/HR/file.csv -> "Documents/HR"
+    """
+    if not path_str:
+        return None
+
+    clean_path = str(path_str).replace("\\", "/")
+
+    if monitored_root is not None and os.path.isabs(clean_path):
+        try:
+            root_str = str(monitored_root.resolve()).replace("\\", "/")
+            if clean_path.lower().startswith(root_str.lower()):
+                clean_path = clean_path[len(root_str):].lstrip("/")
+        except Exception:
+            pass
+
+    clean_path = clean_path.lstrip("/")
+    if not clean_path:
+        return "."
+
+    p = PurePosixPath(clean_path)
+    parent = str(p.parent)
+
+    if parent in ("", "."):
+        return "."
+    return parent
 
 
 def extract_features(
@@ -63,11 +98,20 @@ def extract_features(
     for evt in events:
         evt_type = evt.event_type.lower()
         src_rel = evt.src_path
+        dest_rel = evt.dest_path
 
-        # Track directory
+        # Track directory for src_path
         if src_rel:
-            parent_dir = os.path.dirname(src_rel)
-            directories_set.add(parent_dir if parent_dir else ".")
+            src_dir = normalize_event_directory(src_rel, demo_dir)
+            if src_dir:
+                directories_set.add(src_dir)
+
+        # Track directory for dest_path (rename across directories)
+        if dest_rel or evt_type == "moved":
+            if dest_rel:
+                dest_dir = normalize_event_directory(dest_rel, demo_dir)
+                if dest_dir:
+                    directories_set.add(dest_dir)
 
         # Track extension
         if evt.extension:
